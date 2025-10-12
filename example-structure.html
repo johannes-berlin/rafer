@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webflow Integration - HTML Struktur Referenz</title>
+    <style>
+        /* Nur für Referenz - wird in Webflow erstellt */
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .section { margin: 40px 0; padding: 20px; border: 2px dashed #ccc; }
+        .class-name { background: #e3f2fd; padding: 5px; border-radius: 3px; font-family: monospace; }
+        .attribute { background: #fff3e0; padding: 5px; border-radius: 3px; font-family: monospace; }
+        .note { background: #f3e5f5; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Webflow Integration - HTML Struktur Referenz</h1>
+    <p><strong>Hinweis:</strong> Diese Datei dient nur als Referenz für die HTML-Struktur, die Sie in Webflow erstellen müssen.</p>
+
+    <!-- Hero Section -->
+    <div class="section">
+        <h2>1. Hero Section (Scatter Animation)</h2>
+        <div class="note">
+            <strong>Container:</strong> Section Element mit CSS Class <span class="class-name">hero_main_wrap</span>
+        </div>
+        <div class="note">
+            <strong>Nest-Bereich:</strong> Div Block mit CSS Class <span class="class-name">nest-area</span>
+        </div>
+        <div class="note">
+            <strong>Text:</strong> Heading Element mit Attribut <span class="attribute">data-adhd="true"</span>
+        </div>
+        
+        <pre><code>&lt;section class="hero_main_wrap"&gt;
+  &lt;div class="nest-area"&gt;&lt;/div&gt;
+  &lt;h1 data-adhd="true"&gt;Ihr Text hier&lt;/h1&gt;
+&lt;/section&gt;</code></pre>
+    </div>
+
+    <!-- Challenges Section -->
+    <div class="section">
+        <h2>2. Challenges Section (Card Animation)</h2>
+        <div class="note">
+            <strong>Hauptcontainer:</strong> Section Element mit CSS Class <span class="class-name">challenges_wrap</span>
+        </div>
+        <div class="note">
+            <strong>Cards-Container:</strong> Div Block mit CSS Class <span class="class-name">challenges_cards_wrap</span>
+        </div>
+        <div class="note">
+            <strong>Einzelne Cards:</strong> Div Block mit CSS Class <span class="class-name">challenge_card</span>
+        </div>
+        <div class="note">
+            <strong>Card-Inner:</strong> Div Block mit CSS Class <span class="class-name">challenge_card_inner</span>
+        </div>
+        
+        <pre><code>&lt;section class="challenges_wrap"&gt;
+  &lt;div class="challenges_cards_wrap"&gt;
+    &lt;div class="challenge_card"&gt;
+      &lt;div class="challenge_card_inner"&gt;
+        &lt;h3&gt;Card Titel&lt;/h3&gt;
+        &lt;p&gt;Card Inhalt&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="challenge_card"&gt;
+      &lt;div class="challenge_card_inner"&gt;
+        &lt;h3&gt;Card Titel&lt;/h3&gt;
+        &lt;p&gt;Card Inhalt&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;!-- Weitere Cards... --&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+    </div>
+
+    <!-- Modal Section -->
+    <div class="section">
+        <h2>3. Modal Section (Clip Animation)</h2>
+        <div class="note">
+            <strong>Modal-Wrapper:</strong> Div Block mit CSS Class <span class="class-name">modal-wrap</span>
+        </div>
+        <div class="note">
+            <strong>Modal-Hintergrund:</strong> Div Block mit CSS Class <span class="class-name">modal-bg</span>
+        </div>
+        <div class="note">
+            <strong>Sidebar:</strong> Div Block mit CSS Class <span class="class-name">sidebar</span>
+        </div>
+        <div class="note">
+            <strong>Modal-Inhalte:</strong> Div Block mit Attribut <span class="attribute">data-modal="founders"</span> oder <span class="attribute">data-modal="about"</span>
+        </div>
+        <div class="note">
+            <strong>Trigger-Buttons:</strong> Button Element mit Attribut <span class="attribute">data-modal-cta="founders"</span> oder <span class="attribute">data-modal-cta="about"</span>
+        </div>
+        <div class="note">
+            <strong>Schließen-Buttons:</strong> Button Element mit Attribut <span class="attribute">data-modal-close</span>
+        </div>
+        
+        <pre><code>&lt;div class="modal-wrap"&gt;
+  &lt;div class="modal-bg"&gt;&lt;/div&gt;
+  &lt;div class="sidebar"&gt;
+    &lt;div data-modal="founders"&gt;
+      &lt;h2&gt;Gründer&lt;/h2&gt;
+      &lt;p&gt;Inhalt...&lt;/p&gt;
+      &lt;button data-modal-close&gt;Schließen&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div data-modal="about"&gt;
+      &lt;h2&gt;Über uns&lt;/h2&gt;
+      &lt;p&gt;Inhalt...&lt;/p&gt;
+      &lt;button data-modal-close&gt;Schließen&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Trigger Buttons --&gt;
+&lt;button data-modal-cta="founders"&gt;Gründer anzeigen&lt;/button&gt;
+&lt;button data-modal-cta="about"&gt;Über uns&lt;/button&gt;</code></pre>
+    </div>
+
+    <!-- CSS Classes Übersicht -->
+    <div class="section">
+        <h2>4. CSS Classes Übersicht</h2>
+        <div class="note">
+            <strong>Wichtig:</strong> Alle diese CSS Classes müssen in Webflow erstellt werden
+        </div>
+        
+        <h3>Hero Section:</h3>
+        <ul>
+            <li><span class="class-name">hero_main_wrap</span> - Hauptcontainer</li>
+            <li><span class="class-name">nest-area</span> - Nest-Bereich für Animation</li>
+        </ul>
+        
+        <h3>Challenges Section:</h3>
+        <ul>
+            <li><span class="class-name">challenges_wrap</span> - Hauptcontainer</li>
+            <li><span class="class-name">challenges_cards_wrap</span> - Cards-Container</li>
+            <li><span class="class-name">challenge_card</span> - Einzelne Card</li>
+            <li><span class="class-name">challenge_card_inner</span> - Card-Inhalt</li>
+        </ul>
+        
+        <h3>Modal Section:</h3>
+        <ul>
+            <li><span class="class-name">modal-wrap</span> - Modal-Container</li>
+            <li><span class="class-name">modal-bg</span> - Modal-Hintergrund</li>
+            <li><span class="class-name">sidebar</span> - Modal-Sidebar</li>
+        </ul>
+    </div>
+
+    <!-- Data Attributes Übersicht -->
+    <div class="section">
+        <h2>5. Data Attributes Übersicht</h2>
+        <div class="note">
+            <strong>Wichtig:</strong> Diese Attribute müssen in Webflow hinzugefügt werden
+        </div>
+        
+        <h3>Scatter Animation:</h3>
+        <ul>
+            <li><span class="attribute">data-adhd="true"</span> - Text für Scatter-Animation</li>
+        </ul>
+        
+        <h3>Modal Animation:</h3>
+        <ul>
+            <li><span class="attribute">data-modal="founders"</span> - Modal-Inhalt für Gründer</li>
+            <li><span class="attribute">data-modal="about"</span> - Modal-Inhalt für Über uns</li>
+            <li><span class="attribute">data-modal-cta="founders"</span> - Button für Gründer-Modal</li>
+            <li><span class="attribute">data-modal-cta="about"</span> - Button für Über uns-Modal</li>
+            <li><span class="attribute">data-modal-close</span> - Schließen-Button</li>
+        </ul>
+    </div>
+
+    <!-- Webflow Integration Steps -->
+    <div class="section">
+        <h2>6. Webflow Integration Schritte</h2>
+        <ol>
+            <li><strong>GSAP Scripts hinzufügen:</strong> Site Settings → Custom Code → Head Code</li>
+            <li><strong>Animationen einbetten:</strong> Site Settings → Custom Code → Footer Code</li>
+            <li><strong>HTML-Struktur erstellen:</strong> Alle Elemente mit korrekten CSS Classes</li>
+            <li><strong>Data Attributes hinzufügen:</strong> Alle notwendigen data-* Attribute</li>
+            <li><strong>CSS-Styling:</strong> Alle Styles in Webflow Designer</li>
+            <li><strong>Testing:</strong> Preview und Live-Testing</li>
+        </ol>
+    </div>
+
+    <!-- Hinweise -->
+    <div class="section">
+        <h2>7. Wichtige Hinweise</h2>
+        <div class="note">
+            <strong>CSS Classes:</strong> Müssen exakt so benannt werden wie hier gezeigt
+        </div>
+        <div class="note">
+            <strong>Data Attributes:</strong> Müssen exakt so benannt werden wie hier gezeigt
+        </div>
+        <div class="note">
+            <strong>Element-Hierarchie:</strong> Muss exakt so strukturiert werden wie hier gezeigt
+        </div>
+        <div class="note">
+            <strong>Styling:</strong> Kann in Webflow nach Belieben angepasst werden
+        </div>
+    </div>
+
+</body>
+</html>

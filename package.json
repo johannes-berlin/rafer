@@ -1,0 +1,29 @@
+{
+  "name": "rafer-website",
+  "version": "1.0.0",
+  "description": "Rafer Website mit GSAP Animationen - Netlify & Webflow Ready",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx serve .",
+    "dev": "npx live-server ."
+  },
+  "keywords": [
+    "gsap",
+    "animations",
+    "netlify",
+    "webflow",
+    "website"
+  ],
+  "author": "Rafer Team",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "serve": "^14.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/rafer-website.git"
+  },
+  "homepage": "https://your-site.netlify.app"
+}
