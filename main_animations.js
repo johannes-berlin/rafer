@@ -279,6 +279,12 @@ function initChallengesAnimation() {
     const container = document.querySelector('.challenges_wrap .challenges_cards_wrap');
     if (!container) return;
 
+    // Nur für Screens ab 992px und größer
+    if (window.innerWidth < 992) {
+        console.log('Challenges Card Animation: Screen zu klein (< 992px)');
+        return;
+    }
+
     const containerW = container.clientWidth;
     const cards = document.querySelectorAll('.challenge_card');
     const cardsLength = cards.length;
@@ -294,7 +300,8 @@ function initChallengesAnimation() {
         });
     });
 
-    container.addEventListener("mousemove", e => {
+    // Event Handler Funktionen definieren
+    function handleMouseMove(e) {
         // Cursor position relative to the left edge of the container
         const mouseX = e.clientX - container.getBoundingClientRect().left;
         // Cursor's horizontal percentage within the container
@@ -317,9 +324,9 @@ function initChallengesAnimation() {
             // -1 to target the correct index in the card set
             newPortion(currentPortion - 1);
         }
-    });
+    }
 
-    container.addEventListener("mouseleave", () => {
+    function handleMouseLeave() {
         // -1 to target the correct index in the card set
         resetPortion(currentPortion - 1);
         // No portion is hovered anymore
@@ -331,7 +338,11 @@ function initChallengesAnimation() {
             ease:'elastic.out(1, 0.75)',
             duration:0.8
         });
-    });
+    }
+
+    // Event Listener hinzufügen (nur für Screens >= 992px)
+    container.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("mouseleave", handleMouseLeave);
 
     function resetPortion(index) {
         // Last active card
@@ -388,14 +399,48 @@ function initAllAnimations() {
     initChallengesAnimation();
 }
 
-// DOM Ready Check
-document.addEventListener('DOMContentLoaded', initAllAnimations);
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAllAnimations);
-} else {
-    initAllAnimations();
+// Globale Resize-Funktion für Challenges Animation
+let challengesInitialized = false;
+function handleChallengesResize() {
+    if (window.innerWidth >= 992 && !challengesInitialized) {
+        initChallengesAnimation();
+        challengesInitialized = true;
+    } else if (window.innerWidth < 992 && challengesInitialized) {
+        // Animation deaktivieren für kleine Screens
+        const container = document.querySelector('.challenges_wrap .challenges_cards_wrap');
+        if (container) {
+            // Alle Event Listener entfernen
+            container.replaceWith(container.cloneNode(true));
+        }
+        challengesInitialized = false;
+    }
 }
 
+// DOM Ready Check
+document.addEventListener('DOMContentLoaded', () => {
+    initModalClip();
+    initScatterAnimation();
+    handleChallengesResize(); // Challenges Animation basierend auf Screen-Größe
+});
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        initModalClip();
+        initScatterAnimation();
+        handleChallengesResize();
+    });
+} else {
+    initModalClip();
+    initScatterAnimation();
+    handleChallengesResize();
+}
+
+// Resize Event Listener für Challenges Animation
+window.addEventListener('resize', handleChallengesResize);
+
 // Fallback für verzögerte Initialisierung
-setTimeout(initAllAnimations, 100);
+setTimeout(() => {
+    initModalClip();
+    initScatterAnimation();
+    handleChallengesResize();
+}, 100);
