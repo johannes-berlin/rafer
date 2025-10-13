@@ -274,6 +274,128 @@ function initScatterAnimation() {
     });
 }
 
+// Sticky Scatter Animation für data-add Elemente
+function initStickyScatterAnimation() {
+    const textElements = document.querySelectorAll('[data-add]');
+    const stickyTrigger = document.querySelector('.sticky_trigger');
+    
+    if (!stickyTrigger) {
+        console.log('.sticky_trigger nicht gefunden');
+        return;
+    }
+    
+    if (textElements.length === 0) {
+        console.log('Keine Elemente mit data-add gefunden');
+        return;
+    }
+    
+    textElements.forEach((textElement) => {
+        let split;
+        let scatteredStates = [];
+        
+        // Text aufteilen
+        if (typeof SplitText !== 'undefined') {
+            split = new SplitText(textElement, { 
+                type: 'chars,words',
+                charsClass: 'char',
+                wordsClass: 'word'
+            });
+        } else {
+            split = createSplitText(textElement);
+        }
+        
+        // Basis-Styling setzen
+        gsap.set(split.chars, {
+            position: 'relative',
+            display: 'inline-block'
+        });
+        
+        // Wörter als inline-block setzen um Umbruch zu verhindern
+        if (split.words) {
+            gsap.set(split.words, {
+                display: 'inline-block',
+                whiteSpace: 'nowrap'
+            });
+        }
+        
+        // Sofort verteilen (ohne Animation)
+        setScatteredPositions();
+        
+        function setScatteredPositions() {
+            const containerRect = textElement.getBoundingClientRect();
+            scatteredStates = [];
+            
+            split.chars.forEach((char, i) => {
+                if (char.textContent.trim() === '') {
+                    scatteredStates.push({ x: 0, y: 0, rotation: 0, scale: 1 });
+                    return;
+                }
+                
+                // Zufällige Position um das Element
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 120;
+                const offsetX = Math.cos(angle) * distance;
+                const offsetY = Math.sin(angle) * distance * 0.6;
+                
+                const randomX = (Math.random() - 0.5) * 100;
+                const randomY = (Math.random() - 0.5) * 60;
+                
+                const finalX = offsetX + randomX;
+                const finalY = offsetY + randomY;
+                const rotation = (Math.random() - 0.5) * 60;
+                const scale = gsap.utils.random(0.8, 1.2);
+                
+                scatteredStates.push({ 
+                    x: finalX, 
+                    y: finalY, 
+                    rotation: rotation, 
+                    scale: scale 
+                });
+                
+                // Sofort in scattered Position setzen
+                gsap.set(char, {
+                    x: finalX,
+                    y: finalY,
+                    rotation: rotation,
+                    scale: scale
+                });
+            });
+        }
+        
+        const tl = gsap.timeline({
+            defaults: { ease: "none" },
+            scrollTrigger: {
+                trigger: stickyTrigger,
+                start: "top top",
+                end: "bottom top",
+                scrub: 1,
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+            }
+        });
+        
+        // Animation zu geordnetem Zustand
+        split.chars.forEach((char, i) => {
+            if (char.textContent.trim() === '') return;
+            
+            tl.to(char, {
+                x: 0,
+                y: 0,
+                rotation: 0,
+                scale: 1,
+                duration: 1,
+                ease: "linear",
+            }, i * 0.02);
+        });
+        
+        // Responsive Anpassung
+        window.addEventListener('resize', () => {
+            setScatteredPositions();
+            ScrollTrigger.refresh();
+        });
+    });
+}
+
 // Challenges Card Animation
 function initChallengesAnimation() {
     const container = document.querySelector('.challenges_wrap .challenges_cards_wrap');
@@ -396,6 +518,7 @@ function initChallengesAnimation() {
 function initAllAnimations() {
     initModalClip();
     initScatterAnimation();
+    initStickyScatterAnimation();
     initChallengesAnimation();
 }
 
@@ -420,6 +543,7 @@ function handleChallengesResize() {
 document.addEventListener('DOMContentLoaded', () => {
     initModalClip();
     initScatterAnimation();
+    initStickyScatterAnimation();
     handleChallengesResize(); // Challenges Animation basierend auf Screen-Größe
 });
 
@@ -427,11 +551,13 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         initModalClip();
         initScatterAnimation();
+        initStickyScatterAnimation();
         handleChallengesResize();
     });
 } else {
     initModalClip();
     initScatterAnimation();
+    initStickyScatterAnimation();
     handleChallengesResize();
 }
 
@@ -442,5 +568,6 @@ window.addEventListener('resize', handleChallengesResize);
 setTimeout(() => {
     initModalClip();
     initScatterAnimation();
+    initStickyScatterAnimation();
     handleChallengesResize();
 }, 100);

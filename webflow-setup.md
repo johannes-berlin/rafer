@@ -44,6 +44,17 @@ Dieser Guide zeigt Ihnen, wie Sie die GSAP-Animationen in Webflow integrieren, o
 - **Styling**: Große Schrift, zentriert
 - **Text**: Ihr gewünschter Text
 
+**Text für Sticky Scatter-Animation:**
+- **Element**: Heading oder Text
+- **CSS Class**: `data-add`
+- **Styling**: Nach Belieben
+- **Text**: Ihr gewünschter Text
+
+**Sticky Trigger:**
+- **Element**: Div Block oder Section
+- **CSS Class**: `sticky_trigger`
+- **Styling**: Nach Belieben (wird als ScrollTrigger verwendet)
+
 ### 3.2 Challenges Section (Card Animation)
 
 **Hauptcontainer:**
