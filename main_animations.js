@@ -367,7 +367,7 @@ function initStickyScatterAnimation() {
             scrollTrigger: {
                 trigger: stickyTrigger,
                 start: "top top",
-                end: "bottom top",
+                end: "bottom center",
                 scrub: 1,
                 anticipatePin: 1,
                 invalidateOnRefresh: true,
