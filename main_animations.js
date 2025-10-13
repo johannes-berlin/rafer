@@ -514,12 +514,44 @@ function initChallengesAnimation() {
     }
 }
 
+// Footer Parallax Animation
+function initFooterParallax(){
+  document.querySelectorAll('[data-footer-parallax]').forEach(el => {
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: 'clamp(top bottom)',
+        end: 'clamp(top top)',
+        scrub: true
+      }
+    });
+  
+    const inner = el.querySelector('[data-footer-parallax-inner]');
+    const dark  = el.querySelector('[data-footer-parallax-dark]');
+  
+    if (inner) {
+      tl.from(inner, {
+        yPercent: -25,
+        ease: 'linear'
+      });
+    }
+  
+    if (dark) {
+      tl.from(dark, {
+        opacity: 0.5,
+        ease: 'linear'
+      }, '<');
+    }
+  });
+}
+
 // Initialisierung aller Animationen
 function initAllAnimations() {
     initModalClip();
     initScatterAnimation();
     initStickyScatterAnimation();
     initChallengesAnimation();
+    initFooterParallax();
 }
 
 // Globale Resize-Funktion für Challenges Animation
@@ -544,6 +576,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initModalClip();
     initScatterAnimation();
     initStickyScatterAnimation();
+    initChallengesAnimation();
+    initFooterParallax();
     handleChallengesResize(); // Challenges Animation basierend auf Screen-Größe
 });
 
@@ -552,12 +586,16 @@ if (document.readyState === 'loading') {
         initModalClip();
         initScatterAnimation();
         initStickyScatterAnimation();
+        initChallengesAnimation();
+        initFooterParallax();
         handleChallengesResize();
     });
 } else {
     initModalClip();
     initScatterAnimation();
     initStickyScatterAnimation();
+    initChallengesAnimation();
+    initFooterParallax();
     handleChallengesResize();
 }
 
@@ -569,5 +607,7 @@ setTimeout(() => {
     initModalClip();
     initScatterAnimation();
     initStickyScatterAnimation();
+    initChallengesAnimation();
+    initFooterParallax();
     handleChallengesResize();
 }, 100);

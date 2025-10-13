@@ -113,6 +113,23 @@ Dieser Guide zeigt Ihnen, wie Sie die GSAP-Animationen in Webflow integrieren, o
 - **CSS Class**: `data-modal-close`
 - **Styling**: Button-Design
 
+### 3.4 Footer Parallax Section
+
+**Footer-Container:**
+- **Element**: Section oder Div Block
+- **CSS Class**: `data-footer-parallax`
+- **Styling**: Nach Belieben
+
+**Footer-Inner:**
+- **Element**: Div Block (innerhalb des Containers)
+- **CSS Class**: `data-footer-parallax-inner`
+- **Styling**: Nach Belieben
+
+**Footer-Dark Overlay:**
+- **Element**: Div Block (innerhalb des Containers)
+- **CSS Class**: `data-footer-parallax-dark`
+- **Styling**: Dunkler Overlay, halbtransparent
+
 ## 📋 Schritt 4: CSS-Styling in Webflow
 
 ### 4.1 Hero Section Styling
