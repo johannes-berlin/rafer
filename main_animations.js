@@ -2,7 +2,13 @@
 // Diese Datei enthält alle Animationen, die Sie in Webflow verwenden können
 
 // Registriere ScrollTrigger Plugin
-gsap.registerPlugin(ScrollTrigger);
+if (typeof gsap === 'undefined') {
+  console.error('[GSAP] gsap nicht gefunden. Stelle sicher, dass GSAP vor diesem Script geladen wird.');
+} else if (typeof ScrollTrigger === 'undefined') {
+  console.error('[GSAP] ScrollTrigger nicht gefunden. Stelle sicher, dass das Plugin geladen wird.');
+} else {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 // Modal Clip Animation
 function initModalClip() {
@@ -441,7 +447,20 @@ function setupScatter(textElement) {
 
 // Footer Parallax inkl. geordneter Reveal für data-anim="footer"
 function initFooterParallax(){
-  document.querySelectorAll('[data-footer-parallax]').forEach(el => {
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+    console.warn('[FooterParallax] GSAP oder ScrollTrigger nicht verfügbar.');
+    return;
+  }
+
+  const sections = document.querySelectorAll('[data-footer-parallax]');
+  if (!sections.length) {
+    console.warn('[FooterParallax] Keine Elemente mit [data-footer-parallax] gefunden.');
+    return;
+  }
+
+  console.log(`[FooterParallax] Initialisiere ${sections.length} Abschnitt(e).`);
+
+  sections.forEach(el => {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: el,
@@ -493,6 +512,11 @@ function initFooterParallax(){
       window.addEventListener('resize', onResize);
     });
   });
+
+  // Sicherstellen, dass ScrollTrigger Layout misst
+  if (typeof ScrollTrigger !== 'undefined') {
+    ScrollTrigger.refresh();
+  }
 }
 
 // Challenges Card Animation
