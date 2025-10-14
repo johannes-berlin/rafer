@@ -73,6 +73,35 @@ function initLenis() {
   }
 }
 
+// Scroll-To Anchor Lenis
+function initScrollToAnchorLenis() {
+  if (!__lenisInstance) return;
+
+  const elements = document.querySelectorAll('[data-anchor-target]');
+  if (!elements.length) return;
+
+  elements.forEach((element) => {
+    element.addEventListener('click', function (e) {
+      const target = this.getAttribute('data-anchor-target');
+      if (!target) return;
+
+      // optional: Standardverhalten unterdrücken, falls <a>
+      if (this.tagName === 'A') {
+        e.preventDefault();
+      }
+
+      __lenisInstance.scrollTo(target, {
+        // easing aus Vorgabe
+        easing: (x) => (x < 0.5
+          ? 8 * x * x * x * x
+          : 1 - Math.pow(-2 * x + 2, 4) / 2),
+        duration: 1.2,
+        offset: 0
+      });
+    });
+  });
+}
+
 // Modal Clip Animation
 function initModalClip() {
   const modalWrap   = document.querySelector(".modal-wrap");
@@ -618,6 +647,7 @@ function handleChallengesResize() {
 // DOM Ready Check
 document.addEventListener('DOMContentLoaded', () => {
     initLenis();
+    initScrollToAnchorLenis();
     initModalClip();
     initScatterAnimation();
     initStickyScatterAnimation();
@@ -630,6 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         initLenis();
+        initScrollToAnchorLenis();
         initModalClip();
         initScatterAnimation();
         initStickyScatterAnimation();
@@ -638,6 +669,7 @@ if (document.readyState === 'loading') {
     });
 } else {
     initLenis();
+    initScrollToAnchorLenis();
     initModalClip();
     initScatterAnimation();
     initStickyScatterAnimation();
@@ -651,6 +683,7 @@ window.addEventListener('resize', handleChallengesResize);
 // Fallback für verzögerte Initialisierung
 setTimeout(() => {
     initLenis();
+    initScrollToAnchorLenis();
     initModalClip();
     initScatterAnimation();
     initStickyScatterAnimation();
