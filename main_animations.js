@@ -62,35 +62,35 @@ function isIOS() {
 }
 
 // Scroll-To Anchor mit Lenis (inkl. iOS-Fix) – gemäß Vorgabe
-function initScrollToAnchorLenis() {
-  document.querySelectorAll('[data-anchor-target]').forEach(element => {
-    element.addEventListener('click', function (e) {
-      e.preventDefault(); // native Sprung verhindern
-
-      const selector = this.getAttribute('data-anchor-target');
-      const targetEl = document.querySelector(selector);
-
-      if (!targetEl) return;
-
-      if (isIOS()) {
-        // iOS Safari – native scroll als Fallback
-        try { targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) { targetEl.scrollIntoView(); }
-      } else if (__lenisInstance) {
-        __lenisInstance.scrollTo(targetEl, {
-          easing: (x) => x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2,
-          duration: 1.2,
-          offset: 0 // ggf. per ID-spezifische Logik anpassen
-        });
-      } else {
-        try { targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) { targetEl.scrollIntoView(); }
-      }
-
-      if (targetEl.id) {
-        try { history.replaceState(null, '', `#${targetEl.id}`); } catch (_) {}
-      }
-    }, { passive: false });
-  });
-}
+// function initScrollToAnchorLenis() {
+//   document.querySelectorAll('[data-anchor-target]').forEach(element => {
+//     element.addEventListener('click', function (e) {
+//       e.preventDefault(); // native Sprung verhindern
+//
+//       const selector = this.getAttribute('data-anchor-target');
+//       const targetEl = document.querySelector(selector);
+//
+//       if (!targetEl) return;
+//
+//       if (isIOS()) {
+//         // iOS Safari – native scroll als Fallback
+//         try { targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) { targetEl.scrollIntoView(); }
+//       } else if (__lenisInstance) {
+//         __lenisInstance.scrollTo(targetEl, {
+//           easing: (x) => x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2,
+//           duration: 1.2,
+//           offset: 0 // ggf. per ID-spezifische Logik anpassen
+//         });
+//       } else {
+//         try { targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) { targetEl.scrollIntoView(); }
+//       }
+//
+//       if (targetEl.id) {
+//         try { history.replaceState(null, '', `#${targetEl.id}`); } catch (_) {}
+//       }
+//     }, { passive: false });
+//   });
+// }
 
 // Modal Clip Animation
 function initModalClip() {
@@ -637,7 +637,7 @@ function handleChallengesResize() {
 // DOM Ready Check
 document.addEventListener('DOMContentLoaded', () => {
     initLenis();
-    initScrollToAnchorLenis();
+    // initScrollToAnchorLenis();
     initModalClip();
     initScatterAnimation();
     initStickyScatterAnimation();
@@ -650,7 +650,7 @@ document.addEventListener('DOMContentLoaded', () => {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         initLenis();
-        initScrollToAnchorLenis();
+        // initScrollToAnchorLenis();
         initModalClip();
         initScatterAnimation();
         initStickyScatterAnimation();
@@ -659,7 +659,7 @@ if (document.readyState === 'loading') {
     });
 } else {
     initLenis();
-    initScrollToAnchorLenis();
+    // initScrollToAnchorLenis();
     initModalClip();
     initScatterAnimation();
     initStickyScatterAnimation();
