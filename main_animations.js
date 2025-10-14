@@ -13,7 +13,6 @@ if (typeof gsap === 'undefined') {
 // Lenis Smooth Scroll
 let __lenisInstance = null;
 let __lenisRafId = null;
-let __lenisGsapTicker = null;
 function initLenis() {
   if (typeof Lenis === 'undefined') {
     console.warn('[Lenis] Lenis nicht gefunden. Bitte Lenis vor diesem Script laden.');
@@ -30,21 +29,11 @@ function initLenis() {
     smoothTouch: false,
   });
 
-  // Lenis Taktung: Bevorzugt GSAP-Ticker (bessere Sync), sonst RAF
-  const useGsapTicker = typeof gsap !== 'undefined' && gsap.ticker && typeof gsap.ticker.add === 'function';
-  if (useGsapTicker) {
-    const raf = (timeSec) => {
-      __lenisInstance.raf(timeSec * 1000); // Lenis erwartet ms
-    };
-    __lenisGsapTicker = raf;
-    gsap.ticker.add(__lenisGsapTicker);
-  } else {
-    function raf(timeMs) {
-      __lenisInstance.raf(timeMs);
-      __lenisRafId = requestAnimationFrame(raf);
-    }
+  function raf(time) {
+    __lenisInstance.raf(time);
     __lenisRafId = requestAnimationFrame(raf);
   }
+  __lenisRafId = requestAnimationFrame(raf);
 
   // ScrollTrigger Sync (optional, falls vorhanden)
   if (typeof ScrollTrigger !== 'undefined' && __lenisInstance && typeof __lenisInstance.on === 'function') {
@@ -56,20 +45,16 @@ function initLenis() {
   if (jq && typeof jq === 'function') {
     jq('[data-lenis-start]').on('click', function () {
       __lenisInstance.start();
-      if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
     });
     jq('[data-lenis-stop]').on('click', function () {
       __lenisInstance.stop();
-      if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
     });
     jq('[data-lenis-toggle]').on('click', function () {
       jq(this).toggleClass('stop-scroll');
       if (jq(this).hasClass('stop-scroll')) {
         __lenisInstance.stop();
-        if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
       } else {
         __lenisInstance.start();
-        if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
       }
     });
   }
