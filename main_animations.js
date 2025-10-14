@@ -21,14 +21,8 @@ function initLenis() {
   }
   if (__lenisInstance) return; // bereits initialisiert
 
-  // 1:1 gemäß Vorgabe
-  __lenisInstance = new Lenis({
-    lerp: 0.1,
-    wheelMultiplier: 0.7,
-    gestureOrientation: "vertical",
-    normalizeWheel: false,
-    smoothTouch: false,
-  });
+  // 1:1 gemäß Vorgabe (Default-Konstruktor)
+  __lenisInstance = new Lenis();
 
   // Lenis Taktung: Bevorzugt GSAP-Ticker (bessere Sync), sonst RAF
   const useGsapTicker = typeof gsap !== 'undefined' && gsap.ticker && typeof gsap.ticker.add === 'function';
@@ -38,6 +32,10 @@ function initLenis() {
     };
     __lenisGsapTicker = raf;
     gsap.ticker.add(__lenisGsapTicker);
+    // laut Vorgabe für maximale Glättung
+    if (typeof gsap.ticker.lagSmoothing === 'function') {
+      gsap.ticker.lagSmoothing(0);
+    }
   } else {
     function raf(timeMs) {
       __lenisInstance.raf(timeMs);
@@ -46,7 +44,7 @@ function initLenis() {
     __lenisRafId = requestAnimationFrame(raf);
   }
 
-  // ScrollTrigger Sync (optional, falls vorhanden)
+  // ScrollTrigger Sync gemäß Vorgabe
   if (typeof ScrollTrigger !== 'undefined' && __lenisInstance && typeof __lenisInstance.on === 'function') {
     __lenisInstance.on('scroll', ScrollTrigger.update);
   }
