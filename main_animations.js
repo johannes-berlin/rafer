@@ -10,6 +10,56 @@ if (typeof gsap === 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+// Lenis Smooth Scroll
+let __lenisInstance = null;
+let __lenisRafId = null;
+function initLenis() {
+  if (typeof Lenis === 'undefined') {
+    console.warn('[Lenis] Lenis nicht gefunden. Bitte Lenis vor diesem Script laden.');
+    return;
+  }
+  if (__lenisInstance) return; // bereits initialisiert
+
+  // 1:1 gemäß Vorgabe
+  __lenisInstance = new Lenis({
+    lerp: 0.1,
+    wheelMultiplier: 0.7,
+    gestureOrientation: "vertical",
+    normalizeWheel: false,
+    smoothTouch: false,
+  });
+
+  function raf(time) {
+    __lenisInstance.raf(time);
+    __lenisRafId = requestAnimationFrame(raf);
+  }
+  __lenisRafId = requestAnimationFrame(raf);
+
+  // ScrollTrigger Sync (optional, falls vorhanden)
+  if (typeof ScrollTrigger !== 'undefined' && __lenisInstance && typeof __lenisInstance.on === 'function') {
+    __lenisInstance.on('scroll', ScrollTrigger.update);
+  }
+
+  // jQuery Bindings gemäß Vorgabe (nur wenn jQuery vorhanden ist)
+  const jq = window.jQuery || window.$;
+  if (jq && typeof jq === 'function') {
+    jq('[data-lenis-start]').on('click', function () {
+      __lenisInstance.start();
+    });
+    jq('[data-lenis-stop]').on('click', function () {
+      __lenisInstance.stop();
+    });
+    jq('[data-lenis-toggle]').on('click', function () {
+      jq(this).toggleClass('stop-scroll');
+      if (jq(this).hasClass('stop-scroll')) {
+        __lenisInstance.stop();
+      } else {
+        __lenisInstance.start();
+      }
+    });
+  }
+}
+
 // Modal Clip Animation
 function initModalClip() {
   const modalWrap   = document.querySelector(".modal-wrap");
@@ -554,6 +604,7 @@ function handleChallengesResize() {
 
 // DOM Ready Check
 document.addEventListener('DOMContentLoaded', () => {
+    initLenis();
     initModalClip();
     initScatterAnimation();
     initStickyScatterAnimation();
@@ -565,6 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
+        initLenis();
         initModalClip();
         initScatterAnimation();
         initStickyScatterAnimation();
@@ -572,6 +624,7 @@ if (document.readyState === 'loading') {
         handleChallengesResize();
     });
 } else {
+    initLenis();
     initModalClip();
     initScatterAnimation();
     initStickyScatterAnimation();
@@ -584,6 +637,7 @@ window.addEventListener('resize', handleChallengesResize);
 
 // Fallback für verzögerte Initialisierung
 setTimeout(() => {
+    initLenis();
     initModalClip();
     initScatterAnimation();
     initStickyScatterAnimation();
