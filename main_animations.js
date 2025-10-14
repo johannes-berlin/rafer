@@ -407,113 +407,7 @@ function initStickyScatterAnimation() {
     });
 }
 
-// Scatter-Helfer für Footer-Texte
-function setupScatter(textElement) {
-    const split = (typeof SplitText !== 'undefined')
-        ? new SplitText(textElement, {
-            type: 'chars,words',
-            charsClass: 'char',
-            wordsClass: 'word'
-        })
-        : createSplitText(textElement);
-
-    // Basis-Styling
-    gsap.set(split.chars, { position: 'relative', display: 'inline-block' });
-    if (split.words) gsap.set(split.words, { display: 'inline-block', whiteSpace: 'nowrap' });
-
-    function scatterNow() {
-        split.chars.forEach((char) => {
-            if (char.textContent.trim() === '') return;
-            const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * 120;
-            const offsetX = Math.cos(angle) * distance;
-            const offsetY = Math.sin(angle) * distance * 0.6;
-            const randomX = (Math.random() - 0.5) * 100;
-            const randomY = (Math.random() - 0.5) * 60;
-            const finalX = offsetX + randomX;
-            const finalY = offsetY + randomY;
-            const rotation = (Math.random() - 0.5) * 60;
-            const scale = gsap.utils.random(0.8, 1.2);
-
-            gsap.set(char, { x: finalX, y: finalY, rotation, scale });
-        });
-    }
-
-    // Startzustand: direkt zerstreuen
-    scatterNow();
-
-    return { split, scatterNow };
-}
-
-// Footer Parallax inkl. geordneter Reveal für data-anim="footer"
-function initFooterParallax(){
-  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-    console.warn('[FooterParallax] GSAP oder ScrollTrigger nicht verfügbar.');
-    return;
-  }
-
-  const sections = document.querySelectorAll('[data-footer-parallax]');
-  if (!sections.length) {
-    console.warn('[FooterParallax] Keine Elemente mit [data-footer-parallax] gefunden.');
-    return;
-  }
-
-  console.log(`[FooterParallax] Initialisiere ${sections.length} Abschnitt(e).`);
-
-  sections.forEach(el => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: el,
-        start: 'clamp(top bottom)',
-        end: '+=120%',
-        scrub: true,
-        invalidateOnRefresh: true
-      }
-    });
-
-    const inner = el.querySelector('[data-footer-parallax-inner]');
-
-    if (inner) {
-      tl.from(inner, {
-        yPercent: -60,
-        ease: 'linear',
-        immediateRender: false
-      });
-    }
-
-    // Entfernt: dark overlay Logik
-
-    // Texte mit data-anim="footer" synchron von zerstreut -> geordnet
-    const textTargets = el.querySelectorAll('[data-anim="footer"]');
-    textTargets.forEach((textEl) => {
-      const { split, scatterNow } = setupScatter(textEl);
-
-      // Eine zusammengefasste Tween mit Stagger verhindert, dass die Timeline zu kurz ist
-      tl.to(split.chars, {
-        x: 0, y: 0, rotation: 0, scale: 1,
-        duration: 1,
-        ease: 'linear',
-        stagger: 0.02
-      }, 0);
-
-      // Bei Resize neu streuen, wenn nahe Start/Ende
-      const onResize = () => {
-        const st = tl.scrollTrigger;
-        const progress = st && st.progress != null ? st.progress : 0;
-        if (progress < 0.05 || progress > 0.95) {
-          scatterNow();
-          ScrollTrigger.refresh();
-        }
-      };
-      window.addEventListener('resize', onResize);
-    });
-  });
-
-  // Sicherstellen, dass ScrollTrigger Layout misst
-  if (typeof ScrollTrigger !== 'undefined') {
-    ScrollTrigger.refresh();
-  }
-}
+// (Footer Parallax entfernt)
 
 // Challenges Card Animation
 function initChallengesAnimation() {
@@ -667,10 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
     handleChallengesResize(); // Challenges Animation basierend auf Screen-Größe
 });
 
-// Footer Initialisierung separat (wie gewünscht eigener DOMContentLoaded)
-document.addEventListener('DOMContentLoaded', () => {
-  initFooterParallax();
-});
+// (Footer Initialisierung entfernt)
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
