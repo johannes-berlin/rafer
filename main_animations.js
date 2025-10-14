@@ -465,8 +465,9 @@ function initFooterParallax(){
       scrollTrigger: {
         trigger: el,
         start: 'clamp(top bottom)',
-        end: 'clamp(top top)',
-        scrub: true
+        end: '+=120%',
+        scrub: true,
+        invalidateOnRefresh: true
       }
     });
 
@@ -475,7 +476,8 @@ function initFooterParallax(){
     if (inner) {
       tl.from(inner, {
         yPercent: -60,
-        ease: 'linear'
+        ease: 'linear',
+        immediateRender: false
       });
     }
 
@@ -486,13 +488,13 @@ function initFooterParallax(){
     textTargets.forEach((textEl) => {
       const { split, scatterNow } = setupScatter(textEl);
 
-      split.chars.forEach((char, i) => {
-        if (char.textContent.trim() === '') return;
-        tl.to(char, {
-          x: 0, y: 0, rotation: 0, scale: 1,
-          duration: 1, ease: 'linear'
-        }, 0 + i * 0.02);
-      });
+      // Eine zusammengefasste Tween mit Stagger verhindert, dass die Timeline zu kurz ist
+      tl.to(split.chars, {
+        x: 0, y: 0, rotation: 0, scale: 1,
+        duration: 1,
+        ease: 'linear',
+        stagger: 0.02
+      }, 0);
 
       // Bei Resize neu streuen, wenn nahe Start/Ende
       const onResize = () => {
