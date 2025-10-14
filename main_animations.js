@@ -82,27 +82,37 @@ function initScrollToAnchorLenis() {
 
   elements.forEach((element) => {
     element.addEventListener('click', function (e) {
-      const target = this.getAttribute('data-anchor-target');
+      let target = this.getAttribute('data-anchor-target');
       if (!target) return;
 
-      // optional: Standardverhalten unterdrücken, falls <a>
+      // Einheitliche Normalisierung: Strings ohne '#' als ID interpretieren
+      let normalized = target;
+      if (typeof normalized === 'string' && !normalized.startsWith('#') && !normalized.startsWith('.')) {
+        normalized = `#${normalized}`;
+      }
+
+      // Element auflösen, wenn möglich
+      let targetEl = null;
+      try {
+        targetEl = document.querySelector(normalized);
+      } catch (_) {
+        targetEl = null;
+      }
+
+      // Standardnavigation verhindern, um Doppelsprung zu vermeiden
       if (this.tagName === 'A') {
         e.preventDefault();
       }
 
       // Offset nur für Section mit id "about"
       const isAboutTarget = (() => {
-        if (!target) return false;
-        if (target === '#about' || target === 'about') return true;
-        try {
-          const el = document.querySelector(target.startsWith('#') || target.startsWith('.') ? target : `#${target}`);
-          return !!(el && el.id === 'about');
-        } catch (e) {
-          return false;
-        }
+        if (!normalized) return false;
+        if (normalized === '#about' || normalized === 'about') return true;
+        return !!(targetEl && targetEl.id === 'about');
       })();
 
-      __lenisInstance.scrollTo(target, {
+      // Lenis scrollen – akzeptiert Element oder Selector
+      __lenisInstance.scrollTo(targetEl || normalized, {
         // easing aus Vorgabe
         easing: (x) => (x < 0.5
           ? 8 * x * x * x * x
@@ -110,7 +120,12 @@ function initScrollToAnchorLenis() {
         duration: 1.2,
         offset: isAboutTarget ? -100 : 0
       });
-    });
+
+      // Safari iOS Fallback: Hash setzen, falls Element nicht auflösbar
+      if (!targetEl && typeof normalized === 'string' && normalized.startsWith('#')) {
+        try { history.replaceState(null, '', normalized); } catch (_) {}
+      }
+    }, { passive: false });
   });
 }
 
