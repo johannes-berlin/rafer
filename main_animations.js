@@ -14,6 +14,7 @@ if (typeof gsap === 'undefined') {
 let __lenisInstance = null;
 let __lenisRafId = null;
 let __lenisGsapTicker = null;
+let __lenisAnchorBound = false;
 function initLenis() {
   if (typeof Lenis === 'undefined') {
     console.warn('[Lenis] Lenis nicht gefunden. Bitte Lenis vor diesem Script laden.');
@@ -75,58 +76,64 @@ function initLenis() {
 
 // Scroll-To Anchor Lenis
 function initScrollToAnchorLenis() {
-  if (!__lenisInstance) return;
+  // Mehrfachbindung vermeiden
+  if (__lenisAnchorBound) return;
+  __lenisAnchorBound = true;
 
-  const elements = document.querySelectorAll('[data-anchor-target]');
-  if (!elements.length) return;
+  const handler = function (e) {
+    // Delegation: suche nächstes Element mit data-anchor-target
+    const trigger = e.target && (e.target.closest ? e.target.closest('[data-anchor-target]') : null);
+    if (!trigger) return;
 
-  elements.forEach((element) => {
-    element.addEventListener('click', function (e) {
-      let target = this.getAttribute('data-anchor-target');
-      if (!target) return;
+    let target = trigger.getAttribute('data-anchor-target');
+    if (!target) return;
 
-      // Einheitliche Normalisierung: Strings ohne '#' als ID interpretieren
-      let normalized = target;
-      if (typeof normalized === 'string' && !normalized.startsWith('#') && !normalized.startsWith('.')) {
-        normalized = `#${normalized}`;
-      }
+    // Standardnavigation verhindern (auch auf iOS Safari)
+    e.preventDefault();
 
-      // Element auflösen, wenn möglich
-      let targetEl = null;
-      try {
-        targetEl = document.querySelector(normalized);
-      } catch (_) {
-        targetEl = null;
-      }
+    // Normalisieren: ohne Präfix als ID interpretieren
+    let normalized = target;
+    if (typeof normalized === 'string' && !normalized.startsWith('#') && !normalized.startsWith('.')) {
+      normalized = `#${normalized}`;
+    }
 
-      // Standardnavigation verhindern, um Doppelsprung zu vermeiden
-      if (this.tagName === 'A') {
-        e.preventDefault();
-      }
+    // Element auflösen
+    let targetEl = null;
+    try { targetEl = document.querySelector(normalized); } catch (_) { targetEl = null; }
 
-      // Offset nur für Section mit id "about"
-      const isAboutTarget = (() => {
-        if (!normalized) return false;
-        if (normalized === '#about' || normalized === 'about') return true;
-        return !!(targetEl && targetEl.id === 'about');
-      })();
+    // Offset nur für Section mit id "about"
+    const isAboutTarget = (() => {
+      if (!normalized) return false;
+      if (normalized === '#about' || normalized === 'about') return true;
+      return !!(targetEl && targetEl.id === 'about');
+    })();
 
-      // Lenis scrollen – akzeptiert Element oder Selector
+    // Lenis bevorzugt, sonst Fallback
+    if (__lenisInstance && typeof __lenisInstance.scrollTo === 'function') {
       __lenisInstance.scrollTo(targetEl || normalized, {
-        // easing aus Vorgabe
-        easing: (x) => (x < 0.5
-          ? 8 * x * x * x * x
-          : 1 - Math.pow(-2 * x + 2, 4) / 2),
+        easing: (x) => (x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2),
         duration: 1.2,
         offset: isAboutTarget ? -100 : 0
       });
-
-      // Safari iOS Fallback: Hash setzen, falls Element nicht auflösbar
       if (!targetEl && typeof normalized === 'string' && normalized.startsWith('#')) {
         try { history.replaceState(null, '', normalized); } catch (_) {}
       }
-    }, { passive: false });
-  });
+      if (typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.update();
+      }
+    } else {
+      // Fallback: nativ scrollen
+      if (targetEl && typeof targetEl.scrollIntoView === 'function') {
+        try { targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) { targetEl.scrollIntoView(); }
+      } else if (typeof normalized === 'string' && normalized.startsWith('#')) {
+        try { location.hash = normalized; } catch (_) {}
+      }
+    }
+  };
+
+  // Click und Touchend für iOS Safari; capture zur frühzeitigen Abfangung
+  document.addEventListener('click', handler, { passive: false, capture: true });
+  document.addEventListener('touchend', handler, { passive: false, capture: true });
 }
 
 // Modal Clip Animation
