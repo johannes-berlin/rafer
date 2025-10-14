@@ -112,30 +112,35 @@ function initModalClip() {
 
 // SplitText Fallback für Demo-Zwecke
 if (typeof SplitText === 'undefined') {
-    // Einfacher SplitText Ersatz
-    function createSplitText(element) {
-        const text = element.textContent;
-        element.innerHTML = '';
+    // Fallback-Splitter, erzeugt .word und .char Spans und erhält Leerzeichen
+    function createSplitText(el) {
+        const original = el.textContent;
+        el.textContent = "";
+        const words = [];
         const chars = [];
-        
-        for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            if (char === ' ') {
-                const space = document.createElement('span');
-                space.innerHTML = '&nbsp;';
-                space.classList.add('char');
-                element.appendChild(space);
-                chars.push(space);
-            } else {
-                const span = document.createElement('span');
-                span.textContent = char;
-                span.classList.add('char');
-                element.appendChild(span);
-                chars.push(span);
+        const frag = document.createDocumentFragment();
+
+        original.split(/(\s+)/).forEach(token => {
+            if (token.trim() === "") {
+                frag.appendChild(document.createTextNode(token));
+                return;
             }
-        }
-        
-        return { chars: chars };
+            const wSpan = document.createElement("span");
+            wSpan.className = "word";
+            [...token].forEach(c => {
+                const cSpan = document.createElement("span");
+                cSpan.className = "char";
+                cSpan.textContent = c;
+                wSpan.appendChild(cSpan);
+                chars.push(cSpan);
+            });
+            words.push(wSpan);
+            frag.appendChild(wSpan);
+            frag.appendChild(document.createTextNode(" "));
+        });
+
+        el.appendChild(frag);
+        return { words, chars };
     }
 }
 
@@ -396,6 +401,100 @@ function initStickyScatterAnimation() {
     });
 }
 
+// Scatter-Helfer für Footer-Texte
+function setupScatter(textElement) {
+    const split = (typeof SplitText !== 'undefined')
+        ? new SplitText(textElement, {
+            type: 'chars,words',
+            charsClass: 'char',
+            wordsClass: 'word'
+        })
+        : createSplitText(textElement);
+
+    // Basis-Styling
+    gsap.set(split.chars, { position: 'relative', display: 'inline-block' });
+    if (split.words) gsap.set(split.words, { display: 'inline-block', whiteSpace: 'nowrap' });
+
+    function scatterNow() {
+        split.chars.forEach((char) => {
+            if (char.textContent.trim() === '') return;
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 120;
+            const offsetX = Math.cos(angle) * distance;
+            const offsetY = Math.sin(angle) * distance * 0.6;
+            const randomX = (Math.random() - 0.5) * 100;
+            const randomY = (Math.random() - 0.5) * 60;
+            const finalX = offsetX + randomX;
+            const finalY = offsetY + randomY;
+            const rotation = (Math.random() - 0.5) * 60;
+            const scale = gsap.utils.random(0.8, 1.2);
+
+            gsap.set(char, { x: finalX, y: finalY, rotation, scale });
+        });
+    }
+
+    // Startzustand: direkt zerstreuen
+    scatterNow();
+
+    return { split, scatterNow };
+}
+
+// Footer Parallax inkl. geordneter Reveal für data-anim="footer"
+function initFooterParallax(){
+  document.querySelectorAll('[data-footer-parallax]').forEach(el => {
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: 'clamp(top bottom)',
+        end: 'clamp(top top)',
+        scrub: true
+      }
+    });
+
+    const inner = el.querySelector('[data-footer-parallax-inner]');
+    const dark  = el.querySelector('[data-footer-parallax-dark]');
+
+    if (inner) {
+      tl.from(inner, {
+        yPercent: -60,
+        ease: 'linear'
+      });
+    }
+
+    if (dark) {
+      tl.from(dark, {
+        opacity: 0.5,
+        ease: 'linear'
+      }, '<');
+    }
+
+    // Texte mit data-anim="footer" synchron von zerstreut -> geordnet
+    const textTargets = el.querySelectorAll('[data-anim="footer"]');
+    textTargets.forEach((textEl) => {
+      const { split, scatterNow } = setupScatter(textEl);
+
+      split.chars.forEach((char, i) => {
+        if (char.textContent.trim() === '') return;
+        tl.to(char, {
+          x: 0, y: 0, rotation: 0, scale: 1,
+          duration: 1, ease: 'linear'
+        }, 0 + i * 0.02);
+      });
+
+      // Bei Resize neu streuen, wenn nahe Start/Ende
+      const onResize = () => {
+        const st = tl.scrollTrigger;
+        const progress = st && st.progress != null ? st.progress : 0;
+        if (progress < 0.05 || progress > 0.95) {
+          scatterNow();
+          ScrollTrigger.refresh();
+        }
+      };
+      window.addEventListener('resize', onResize);
+    });
+  });
+}
+
 // Challenges Card Animation
 function initChallengesAnimation() {
     const container = document.querySelector('.challenges_wrap .challenges_cards_wrap');
@@ -546,6 +645,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initStickyScatterAnimation();
     initChallengesAnimation();
     handleChallengesResize(); // Challenges Animation basierend auf Screen-Größe
+});
+
+// Footer Initialisierung separat (wie gewünscht eigener DOMContentLoaded)
+document.addEventListener('DOMContentLoaded', () => {
+  initFooterParallax();
 });
 
 if (document.readyState === 'loading') {
