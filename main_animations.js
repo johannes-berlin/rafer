@@ -22,30 +22,10 @@ function initLenis() {
   }
   if (__lenisInstance) return; // bereits initialisiert
 
-  // 1:1 gemäß Vorgabe (Default-Konstruktor)
-  __lenisInstance = new Lenis();
+  // Lenis gemäß Fix: autoRaf aktiv
+  __lenisInstance = new Lenis({ autoRaf: true });
 
-  // Lenis Taktung: Bevorzugt GSAP-Ticker (bessere Sync), sonst RAF
-  const useGsapTicker = typeof gsap !== 'undefined' && gsap.ticker && typeof gsap.ticker.add === 'function';
-  if (useGsapTicker) {
-    const raf = (timeSec) => {
-      __lenisInstance.raf(timeSec * 1000); // Lenis erwartet ms
-    };
-    __lenisGsapTicker = raf;
-    gsap.ticker.add(__lenisGsapTicker);
-    // laut Vorgabe für maximale Glättung
-    if (typeof gsap.ticker.lagSmoothing === 'function') {
-      gsap.ticker.lagSmoothing(0);
-    }
-  } else {
-    function raf(timeMs) {
-      __lenisInstance.raf(timeMs);
-      __lenisRafId = requestAnimationFrame(raf);
-    }
-    __lenisRafId = requestAnimationFrame(raf);
-  }
-
-  // ScrollTrigger Sync gemäß Vorgabe
+  // Optional: ScrollTrigger syncen
   if (typeof ScrollTrigger !== 'undefined' && __lenisInstance && typeof __lenisInstance.on === 'function') {
     __lenisInstance.on('scroll', ScrollTrigger.update);
   }
@@ -75,65 +55,41 @@ function initLenis() {
 }
 
 // Scroll-To Anchor Lenis
+// iOS-Erkennung gemäß Fix
+function isIOS() {
+  const ua = navigator.userAgent || navigator.vendor || window.opera;
+  return /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+// Scroll-To Anchor mit Lenis (inkl. iOS-Fix) – gemäß Vorgabe
 function initScrollToAnchorLenis() {
-  // Mehrfachbindung vermeiden
-  if (__lenisAnchorBound) return;
-  __lenisAnchorBound = true;
+  document.querySelectorAll('[data-anchor-target]').forEach(element => {
+    element.addEventListener('click', function (e) {
+      e.preventDefault(); // native Sprung verhindern
 
-  const handler = function (e) {
-    // Delegation: suche nächstes Element mit data-anchor-target
-    const trigger = e.target && (e.target.closest ? e.target.closest('[data-anchor-target]') : null);
-    if (!trigger) return;
+      const selector = this.getAttribute('data-anchor-target');
+      const targetEl = document.querySelector(selector);
 
-    let target = trigger.getAttribute('data-anchor-target');
-    if (!target) return;
+      if (!targetEl) return;
 
-    // Standardnavigation verhindern (auch auf iOS Safari)
-    e.preventDefault();
-
-    // Normalisieren: ohne Präfix als ID interpretieren
-    let normalized = target;
-    if (typeof normalized === 'string' && !normalized.startsWith('#') && !normalized.startsWith('.')) {
-      normalized = `#${normalized}`;
-    }
-
-    // Element auflösen
-    let targetEl = null;
-    try { targetEl = document.querySelector(normalized); } catch (_) { targetEl = null; }
-
-    // Offset nur für Section mit id "about"
-    const isAboutTarget = (() => {
-      if (!normalized) return false;
-      if (normalized === '#about' || normalized === 'about') return true;
-      return !!(targetEl && targetEl.id === 'about');
-    })();
-
-    // Lenis bevorzugt, sonst Fallback
-    if (__lenisInstance && typeof __lenisInstance.scrollTo === 'function') {
-      __lenisInstance.scrollTo(targetEl || normalized, {
-        easing: (x) => (x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2),
-        duration: 1.2,
-        offset: isAboutTarget ? -100 : 0
-      });
-      if (!targetEl && typeof normalized === 'string' && normalized.startsWith('#')) {
-        try { history.replaceState(null, '', normalized); } catch (_) {}
-      }
-      if (typeof ScrollTrigger !== 'undefined') {
-        ScrollTrigger.update();
-      }
-    } else {
-      // Fallback: nativ scrollen
-      if (targetEl && typeof targetEl.scrollIntoView === 'function') {
+      if (isIOS()) {
+        // iOS Safari – native scroll als Fallback
         try { targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) { targetEl.scrollIntoView(); }
-      } else if (typeof normalized === 'string' && normalized.startsWith('#')) {
-        try { location.hash = normalized; } catch (_) {}
+      } else if (__lenisInstance) {
+        __lenisInstance.scrollTo(targetEl, {
+          easing: (x) => x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2,
+          duration: 1.2,
+          offset: 0 // ggf. per ID-spezifische Logik anpassen
+        });
+      } else {
+        try { targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) { targetEl.scrollIntoView(); }
       }
-    }
-  };
 
-  // Click und Touchend für iOS Safari; capture zur frühzeitigen Abfangung
-  document.addEventListener('click', handler, { passive: false, capture: true });
-  document.addEventListener('touchend', handler, { passive: false, capture: true });
+      if (targetEl.id) {
+        try { history.replaceState(null, '', `#${targetEl.id}`); } catch (_) {}
+      }
+    }, { passive: false });
+  });
 }
 
 // Modal Clip Animation
