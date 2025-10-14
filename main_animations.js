@@ -96,7 +96,7 @@ function initScrollToAnchorLenis() {
           ? 8 * x * x * x * x
           : 1 - Math.pow(-2 * x + 2, 4) / 2),
         duration: 1.2,
-        offset: 0
+        offset: -100
       });
     });
   });
