@@ -471,7 +471,6 @@ function initFooterParallax(){
     });
 
     const inner = el.querySelector('[data-footer-parallax-inner]');
-    const dark  = el.querySelector('[data-footer-parallax-dark]');
 
     if (inner) {
       tl.from(inner, {
@@ -480,12 +479,7 @@ function initFooterParallax(){
       });
     }
 
-    if (dark) {
-      tl.from(dark, {
-        opacity: 0.5,
-        ease: 'linear'
-      }, '<');
-    }
+    // Entfernt: dark overlay Logik
 
     // Texte mit data-anim="footer" synchron von zerstreut -> geordnet
     const textTargets = el.querySelectorAll('[data-anim="footer"]');
