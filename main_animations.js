@@ -90,13 +90,25 @@ function initScrollToAnchorLenis() {
         e.preventDefault();
       }
 
+      // Offset nur für Section mit id "about"
+      const isAboutTarget = (() => {
+        if (!target) return false;
+        if (target === '#about' || target === 'about') return true;
+        try {
+          const el = document.querySelector(target.startsWith('#') || target.startsWith('.') ? target : `#${target}`);
+          return !!(el && el.id === 'about');
+        } catch (e) {
+          return false;
+        }
+      })();
+
       __lenisInstance.scrollTo(target, {
         // easing aus Vorgabe
         easing: (x) => (x < 0.5
           ? 8 * x * x * x * x
           : 1 - Math.pow(-2 * x + 2, 4) / 2),
         duration: 1.2,
-        offset: -100
+        offset: isAboutTarget ? -100 : 0
       });
     });
   });
