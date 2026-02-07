@@ -129,135 +129,114 @@ if (typeof gsap === 'undefined') {
   
   // Scatter Animation für Hero Text
   function initScatterAnimation() {
+      const SCATTER_CONFIG = {
+          DEBUG_MARKERS: false,
+          CHAR_DURATION: 0.6,
+          CHAR_STAGGER: 0.02,
+          SCATTER_DISTANCE: 120,
+          SCATTER_DISTANCE_Y_FACTOR: 0.6,
+          RANDOM_OFFSET: 100,
+          RANDOM_OFFSET_Y: 60,
+          ROTATION_RANGE: 60,
+          SCALE_MIN: 0.8,
+          SCALE_MAX: 1.2
+      };
+  
+      if (typeof gsap === 'undefined') {
+          console.error('[scatter-anim] GSAP (gsap.min.js) ist nicht geladen.');
+          return;
+      }
+      if (typeof ScrollTrigger === 'undefined') {
+          console.error('[scatter-anim] ScrollTrigger (ScrollTrigger.min.js) ist nicht geladen.');
+          return;
+      }
+  
       const textElement = document.querySelector('[data-adhd="true"]');
-      
       if (!textElement) {
           console.log('Element mit data-adhd="true" nicht gefunden');
           return;
       }
   
-      let split;
-      let scatteredStates = [];
+      function setupScatter(el) {
+          const split = (typeof SplitText !== 'undefined')
+              ? new SplitText(el, {
+                  type: 'chars,words',
+                  charsClass: 'char',
+                  wordsClass: 'word'
+              })
+              : createSplitText(el);
   
-      // Text aufteilen - mit wordSeparator Option für saubere Wort-Trennung
-      if (typeof SplitText !== 'undefined') {
-          split = new SplitText(textElement, { 
-              type: 'chars,words',
-              charsClass: 'char',
-              wordsClass: 'word'
+          gsap.set(split.chars, {
+              position: 'relative',
+              display: 'inline-block'
           });
-      } else {
-          split = createSplitText(textElement);
-      }
   
-      // Basis-Styling setzen
-      gsap.set(split.chars, {
-          position: 'relative',
-          display: 'inline-block'
-      });
-  
-      // Wörter als inline-block setzen um Umbruch zu verhindern
-      if (split.words) {
-          gsap.set(split.words, {
-              display: 'inline-block',
-              whiteSpace: 'nowrap'
-          });
-      }
-  
-      // Sofort verteilen (ohne Animation)
-      setScatteredPositions();
-  
-      function setScatteredPositions() {
-          const nestArea = document.querySelector('.nest-area');
-          const heroWrap = document.querySelector('.hero_main_wrap');
-          
-          if (!heroWrap) {
-              console.log('.hero_main_wrap nicht gefunden');
-              return;
+          if (split.words) {
+              gsap.set(split.words, {
+                  display: 'inline-block',
+                  whiteSpace: 'nowrap'
+              });
           }
   
-          const containerRect = heroWrap.getBoundingClientRect();
-          scatteredStates = [];
+          function scatterNow() {
+              split.chars.forEach((char) => {
+                  if (!char || char.textContent.trim() === '') return;
   
-          // Fallback falls .nest-area nicht existiert
-          let nestRect;
-          if (nestArea) {
-              nestRect = nestArea.getBoundingClientRect();
-          } else {
-              nestRect = {
-                  left: containerRect.left + containerRect.width / 2 - 150,
-                  top: containerRect.top + containerRect.height / 2 - 100,
-                  width: 300,
-                  height: 200
-              };
+                  const angle = Math.random() * Math.PI * 2;
+                  const distance = Math.random() * SCATTER_CONFIG.SCATTER_DISTANCE;
+                  const offsetX = Math.cos(angle) * distance;
+                  const offsetY = Math.sin(angle) * distance * SCATTER_CONFIG.SCATTER_DISTANCE_Y_FACTOR;
+                  const randomX = (Math.random() - 0.5) * SCATTER_CONFIG.RANDOM_OFFSET;
+                  const randomY = (Math.random() - 0.5) * SCATTER_CONFIG.RANDOM_OFFSET_Y;
+                  const finalX = offsetX + randomX;
+                  const finalY = offsetY + randomY;
+                  const rotation = (Math.random() - 0.5) * SCATTER_CONFIG.ROTATION_RANGE;
+                  const scale = gsap.utils.random(SCATTER_CONFIG.SCALE_MIN, SCATTER_CONFIG.SCALE_MAX);
+  
+                  gsap.set(char, {
+                      x: finalX,
+                      y: finalY,
+                      rotation: rotation,
+                      scale: scale,
+                      force3D: true
+                  });
+              });
           }
   
-          split.chars.forEach((char, i) => {
-              if (char.textContent.trim() === '') {
-                  scatteredStates.push({ x: 0, y: 0, rotation: 0, scale: 1 });
-                  return;
-              }
-              
-              // Zufällige Position im "Nest"-Bereich
-              const angle = Math.random() * Math.PI * 2;
-              const distance = Math.random() * 120;
-              const offsetX = Math.cos(angle) * distance;
-              const offsetY = Math.sin(angle) * distance * 0.6;
-              
-              const randomX = (Math.random() - 0.5) * 100;
-              const randomY = (Math.random() - 0.5) * 60;
-              
-              const finalX = offsetX + randomX;
-              const finalY = offsetY + randomY;
-              const rotation = (Math.random() - 0.5) * 60;
-              const scale = gsap.utils.random(0.8, 1.2);
-              
-              scatteredStates.push({ 
-                  x: finalX, 
-                  y: finalY, 
-                  rotation: rotation, 
-                  scale: scale 
-              });
-              
-              // Sofort in scattered Position setzen
-              gsap.set(char, {
-                  x: finalX,
-                  y: finalY,
-                  rotation: rotation,
-                  scale: scale
-              });
-          });
+          scatterNow();
+  
+          return { split, scatterNow };
       }
+  
+      const { split, scatterNow } = setupScatter(textElement);
   
       const tl = gsap.timeline({
-          defaults: { ease: "none" }, // lineare Ease für alle Tweens in tl
+          defaults: { ease: 'none' },
           scrollTrigger: {
-              trigger: textElement,           // dein data-adhd="true"-Element
-              start: "top 80%",
-              end: "bottom 10%",
-              scrub: 1,                       // smoothes Scrubbing (~1s Nachlauf)
-              anticipatePin: 1,               // reduziert kleine Jumps beim Pinning (optional)
-              invalidateOnRefresh: true,
+              trigger: textElement,
+              start: 'top 80%',
+              end: 'bottom 10%',
+              scrub: 1,
+              markers: SCATTER_CONFIG.DEBUG_MARKERS,
+              invalidateOnRefresh: true
           }
       });
   
-      // Animation zu geordnetem Zustand
-      split.chars.forEach((char, i) => {
-          if (char.textContent.trim() === '') return;
-          
-          tl.to(char, {
-              x: 0,
-              y: 0,
-              rotation: 0,
-              scale: 1,
-              duration: 1,
-              ease: "linear",
-          }, i * 0.02); // Kleiner zeitlicher Versatz für jeden Buchstaben
-      });
+      const chars = split.chars.filter(c => c && c.textContent.trim() !== '');
+      tl.to(chars, {
+          x: 0,
+          y: 0,
+          rotation: 0,
+          scale: 1,
+          duration: SCATTER_CONFIG.CHAR_DURATION,
+          stagger: {
+              each: SCATTER_CONFIG.CHAR_STAGGER,
+              from: 'start'
+          }
+      }, 0);
   
-      // Responsive Anpassung
       window.addEventListener('resize', () => {
-          setScatteredPositions();
+          scatterNow();
           ScrollTrigger.refresh();
       });
   }
