@@ -605,8 +605,8 @@ if (typeof gsap === 'undefined') {
           paused: true,
           scrollTrigger: {
               trigger: titleSpan,
-              start: 'top 50%',
-              end: 'top 50%',
+              start: 'top 60%',
+              end: 'top 60%',
               markers: PARTNERS_CONFIG.DEBUG_MARKERS,
               once: true,
               onEnter: () => tl.play()
