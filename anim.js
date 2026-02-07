@@ -157,8 +157,6 @@ if (typeof gsap === 'undefined') {
       }
       
       textElements.forEach((textElement) => {
-          // FOUC vermeiden: Element erst nach Setup sichtbar machen
-          textElement.style.visibility = 'hidden';
           let split;
           let scatteredStates = [];
           
@@ -189,7 +187,6 @@ if (typeof gsap === 'undefined') {
           
           // Sofort verteilen (ohne Animation)
           setScatteredPositions();
-          textElement.style.visibility = 'visible';
           
           function setScatteredPositions() {
               const containerRect = textElement.getBoundingClientRect();
