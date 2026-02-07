@@ -1,5 +1,9 @@
 // GSAP Animationen für Webflow Integration
 // Diese Datei enthält alle Animationen, die Sie in Webflow verwenden können
+//
+// =========================================================
+// 01) BASIS & DEPENDENCIES
+// =========================================================
 
 // Registriere ScrollTrigger Plugin
 if (typeof gsap === 'undefined') {
@@ -10,6 +14,9 @@ if (typeof gsap === 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
   }
   
+  // =========================================================
+  // 02) SMOOTH SCROLL (LENIS)
+  // =========================================================
   // Lenis Smooth Scroll
   let __lenisInstance = null;
   let __lenisRafId = null;
@@ -93,6 +100,9 @@ if (typeof gsap === 'undefined') {
   // }
   
   
+  // =========================================================
+  // 03) SPLITTEXT FALLBACK
+  // =========================================================
   // SplitText Fallback für Demo-Zwecke
   if (typeof SplitText === 'undefined') {
       // Fallback-Splitter, erzeugt .word und .char Spans und erhält Leerzeichen
@@ -128,6 +138,9 @@ if (typeof gsap === 'undefined') {
   }
   
   
+  // =========================================================
+  // 04) ANIMATIONEN
+  // =========================================================
   // Sticky Scatter Animation für data-add Elemente
   function initStickyScatterAnimation() {
       const textElements = document.querySelectorAll('[data-add]');
@@ -598,6 +611,9 @@ if (typeof gsap === 'undefined') {
       }
   }
   
+  // =========================================================
+  // 05) INITIALISIERUNG
+  // =========================================================
   // Initialisierung aller Animationen
   function initAllAnimations() {
       initStickyScatterAnimation();
