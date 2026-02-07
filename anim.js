@@ -384,7 +384,235 @@ if (typeof gsap === 'undefined') {
       });
   }
   
-  // (Footer Parallax entfernt)
+  // Footer Parallax & Scatter Animation
+  function initFooterParallax() {
+      const FOOTER_CONFIG = {
+          DEBUG_MARKERS: false,
+          CHAR_DURATION: 0.6,
+          CHAR_STAGGER: 0.02,
+          SCATTER_DISTANCE: 120,
+          SCATTER_DISTANCE_Y_FACTOR: 0.6,
+          RANDOM_OFFSET: 100,
+          RANDOM_OFFSET_Y: 60,
+          ROTATION_RANGE: 60,
+          SCALE_MIN: 0.8,
+          SCALE_MAX: 1.2,
+          PARALLAX_Y_PERCENT: -30,
+          DARK_OVERLAY_OPACITY: 0.5
+      };
+  
+      if (typeof gsap === 'undefined') {
+          console.error('[footer-anim] GSAP (gsap.min.js) ist nicht geladen.');
+          return;
+      }
+      if (typeof ScrollTrigger === 'undefined') {
+          console.error('[footer-anim] ScrollTrigger (ScrollTrigger.min.js) ist nicht geladen.');
+          return;
+      }
+  
+      const sections = document.querySelectorAll('[data-footer-parallax]');
+      if (!sections.length) {
+          console.warn('[footer-anim] Keine Elemente mit [data-footer-parallax] gefunden.');
+          return;
+      }
+  
+      function setupFooterScatter(textElement) {
+          const split = (typeof SplitText !== 'undefined')
+              ? new SplitText(textElement, {
+                  type: 'chars,words',
+                  charsClass: 'char',
+                  wordsClass: 'word'
+              })
+              : createSplitText(textElement);
+  
+          gsap.set(split.chars, {
+              position: 'relative',
+              display: 'inline-block'
+          });
+  
+          if (split.words) {
+              gsap.set(split.words, {
+                  display: 'inline-block',
+                  whiteSpace: 'nowrap'
+              });
+          }
+  
+          function scatterNow() {
+              split.chars.forEach((char) => {
+                  if (!char || char.textContent.trim() === '') return;
+  
+                  const angle = Math.random() * Math.PI * 2;
+                  const distance = Math.random() * FOOTER_CONFIG.SCATTER_DISTANCE;
+                  const offsetX = Math.cos(angle) * distance;
+                  const offsetY = Math.sin(angle) * distance * FOOTER_CONFIG.SCATTER_DISTANCE_Y_FACTOR;
+                  const randomX = (Math.random() - 0.5) * FOOTER_CONFIG.RANDOM_OFFSET;
+                  const randomY = (Math.random() - 0.5) * FOOTER_CONFIG.RANDOM_OFFSET_Y;
+                  const finalX = offsetX + randomX;
+                  const finalY = offsetY + randomY;
+                  const rotation = (Math.random() - 0.5) * FOOTER_CONFIG.ROTATION_RANGE;
+                  const scale = gsap.utils.random(FOOTER_CONFIG.SCALE_MIN, FOOTER_CONFIG.SCALE_MAX);
+  
+                  gsap.set(char, {
+                      x: finalX,
+                      y: finalY,
+                      rotation: rotation,
+                      scale: scale,
+                      force3D: true
+                  });
+              });
+          }
+  
+          scatterNow();
+  
+          return { split, scatterNow };
+      }
+  
+      sections.forEach(el => {
+          const tl = gsap.timeline({
+              defaults: { ease: 'none' },
+              scrollTrigger: {
+                  trigger: el,
+                  start: 'top bottom',
+                  end: 'top top',
+                  scrub: true,
+                  markers: FOOTER_CONFIG.DEBUG_MARKERS,
+                  invalidateOnRefresh: true
+              }
+          });
+  
+          const inner = el.querySelector('[data-footer-parallax-inner]');
+          const dark = el.querySelector('[data-footer-parallax-dark]');
+          const textTargets = el.querySelectorAll('[data-anim="footer"]');
+  
+          let maxTextTotal = 0;
+  
+          textTargets.forEach((textEl) => {
+              const { split, scatterNow } = setupFooterScatter(textEl);
+  
+              const chars = split.chars.filter(c => c && c.textContent.trim() !== '');
+              const textTotal = chars.length > 0
+                  ? FOOTER_CONFIG.CHAR_DURATION + FOOTER_CONFIG.CHAR_STAGGER * (chars.length - 1)
+                  : 0;
+  
+              maxTextTotal = Math.max(maxTextTotal, textTotal);
+  
+              tl.to(chars, {
+                  x: 0,
+                  y: 0,
+                  rotation: 0,
+                  scale: 1,
+                  duration: FOOTER_CONFIG.CHAR_DURATION,
+                  stagger: {
+                      each: FOOTER_CONFIG.CHAR_STAGGER,
+                      from: 'start'
+                  }
+              }, 0);
+  
+              const onResize = () => {
+                  const st = tl.scrollTrigger;
+                  const progress = st && st.progress != null ? st.progress : 0;
+                  if (progress < 0.05 || progress > 0.95) {
+                      scatterNow();
+                      ScrollTrigger.refresh();
+                  }
+              };
+              window.addEventListener('resize', onResize, { passive: true });
+          });
+  
+          if (maxTextTotal === 0) maxTextTotal = 1;
+  
+          if (inner) {
+              tl.from(inner, {
+                  yPercent: FOOTER_CONFIG.PARALLAX_Y_PERCENT,
+                  duration: maxTextTotal,
+                  force3D: true
+              }, 0);
+          } else {
+              console.warn('[footer-anim] Kein [data-footer-parallax-inner] in:', el);
+          }
+  
+          if (dark) {
+              tl.from(dark, {
+                  opacity: FOOTER_CONFIG.DARK_OVERLAY_OPACITY,
+                  duration: maxTextTotal
+              }, 0);
+          }
+      });
+  
+      if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => ScrollTrigger.refresh());
+      } else {
+          setTimeout(() => ScrollTrigger.refresh(), 0);
+      }
+  }
+  
+  // Partners Title Animation
+  function initPartnersTitle() {
+      const PARTNERS_CONFIG = {
+          SVG_DURATION: 1,
+          TEXT_OFFSET: 0.3,
+          TEXT_DURATION: 0.5,
+          TEXT_STAGGER: 0.03,
+          TEXT_Y_OFFSET: 20,
+          DEBUG_MARKERS: false
+      };
+  
+      if (typeof gsap === 'undefined') {
+          console.error('[partners-anim] GSAP (gsap.min.js) ist nicht geladen.');
+          return;
+      }
+      if (typeof ScrollTrigger === 'undefined') {
+          console.error('[partners-anim] ScrollTrigger (ScrollTrigger.min.js) ist nicht geladen.');
+          return;
+      }
+  
+      const titleSpan = document.querySelector('.partners_title-span');
+      const clip = document.querySelector('.partners_title-svg-clip');
+  
+      if (!titleSpan || !clip) {
+          console.warn('[partners-anim] .partners_title-span oder .partners_title-svg-clip nicht gefunden.');
+          return;
+      }
+  
+      gsap.set(titleSpan, { autoAlpha: 0 });
+  
+      const split = (typeof SplitText !== 'undefined')
+          ? new SplitText(titleSpan, { type: 'chars' })
+          : createSplitText(titleSpan);
+  
+      const tl = gsap.timeline({
+          paused: true,
+          scrollTrigger: {
+              trigger: titleSpan,
+              start: 'top 50%',
+              end: 'top 50%',
+              markers: PARTNERS_CONFIG.DEBUG_MARKERS,
+              once: true,
+              onEnter: () => tl.play()
+          }
+      });
+  
+      tl.set(clip, {
+          clipPath: 'inset(0 100% 0 0)',
+          webkitClipPath: 'inset(0 100% 0 0)'
+      })
+      .to(clip, {
+          clipPath: 'inset(0 0% 0 0)',
+          webkitClipPath: 'inset(0 0% 0 0)',
+          duration: PARTNERS_CONFIG.SVG_DURATION,
+          ease: 'power4.inOut'
+      })
+      .set(titleSpan, {
+          autoAlpha: 1
+      }, `-=${PARTNERS_CONFIG.TEXT_OFFSET}`)
+      .from(split.chars, {
+          opacity: 0,
+          y: PARTNERS_CONFIG.TEXT_Y_OFFSET,
+          duration: PARTNERS_CONFIG.TEXT_DURATION,
+          stagger: PARTNERS_CONFIG.TEXT_STAGGER,
+          ease: 'back.out(1.7)'
+      }, `-=${PARTNERS_CONFIG.TEXT_OFFSET}`);
+  }
   
   // Challenges Card Animation
   function initChallengesAnimation() {
@@ -509,6 +737,8 @@ if (typeof gsap === 'undefined') {
       initScatterAnimation();
       initStickyScatterAnimation();
       initChallengesAnimation();
+      initFooterParallax();
+      initPartnersTitle();
   }
   
   // Globale Resize-Funktion für Challenges Animation
@@ -535,6 +765,8 @@ if (typeof gsap === 'undefined') {
       initScatterAnimation();
       initStickyScatterAnimation();
       initChallengesAnimation();
+      initFooterParallax();
+      initPartnersTitle();
       handleChallengesResize(); // Challenges Animation basierend auf Screen-Größe
   });
   
@@ -547,6 +779,8 @@ if (typeof gsap === 'undefined') {
           initScatterAnimation();
           initStickyScatterAnimation();
           initChallengesAnimation();
+          initFooterParallax();
+          initPartnersTitle();
           handleChallengesResize();
       });
   } else {
@@ -555,6 +789,8 @@ if (typeof gsap === 'undefined') {
       initScatterAnimation();
       initStickyScatterAnimation();
       initChallengesAnimation();
+      initFooterParallax();
+      initPartnersTitle();
       handleChallengesResize();
   }
   
@@ -568,6 +804,8 @@ if (typeof gsap === 'undefined') {
       initScatterAnimation();
       initStickyScatterAnimation();
       initChallengesAnimation();
+      initFooterParallax();
+      initPartnersTitle();
       handleChallengesResize();
   }, 100);
   
