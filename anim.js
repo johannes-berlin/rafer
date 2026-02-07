@@ -802,7 +802,7 @@ if (typeof gsap === 'undefined') {
   
       ScrollTrigger.create({
           trigger: footer,
-          start: 'top 80%',
+          start: 'top 10%',
           onEnter: () => {
               gsap.to(nav, {
                   yPercent: -100,
