@@ -127,119 +127,6 @@ if (typeof gsap === 'undefined') {
       }
   }
   
-  // Scatter Animation für Hero Text
-  function initScatterAnimation() {
-      const SCATTER_CONFIG = {
-          DEBUG_MARKERS: false,
-          CHAR_DURATION: 0.6,
-          CHAR_STAGGER: 0.02,
-          SCATTER_DISTANCE: 120,
-          SCATTER_DISTANCE_Y_FACTOR: 0.6,
-          RANDOM_OFFSET: 100,
-          RANDOM_OFFSET_Y: 60,
-          ROTATION_RANGE: 60,
-          SCALE_MIN: 0.8,
-          SCALE_MAX: 1.2
-      };
-  
-      if (typeof gsap === 'undefined') {
-          console.error('[scatter-anim] GSAP (gsap.min.js) ist nicht geladen.');
-          return;
-      }
-      if (typeof ScrollTrigger === 'undefined') {
-          console.error('[scatter-anim] ScrollTrigger (ScrollTrigger.min.js) ist nicht geladen.');
-          return;
-      }
-  
-      const textElement = document.querySelector('[data-adhd="true"]');
-      if (!textElement) {
-          console.log('Element mit data-adhd="true" nicht gefunden');
-          return;
-      }
-  
-      function setupScatter(el) {
-          const split = (typeof SplitText !== 'undefined')
-              ? new SplitText(el, {
-                  type: 'chars,words',
-                  charsClass: 'char',
-                  wordsClass: 'word'
-              })
-              : createSplitText(el);
-  
-          gsap.set(split.chars, {
-              position: 'relative',
-              display: 'inline-block'
-          });
-  
-          if (split.words) {
-              gsap.set(split.words, {
-                  display: 'inline-block',
-                  whiteSpace: 'nowrap'
-              });
-          }
-  
-          function scatterNow() {
-              split.chars.forEach((char) => {
-                  if (!char || char.textContent.trim() === '') return;
-  
-                  const angle = Math.random() * Math.PI * 2;
-                  const distance = Math.random() * SCATTER_CONFIG.SCATTER_DISTANCE;
-                  const offsetX = Math.cos(angle) * distance;
-                  const offsetY = Math.sin(angle) * distance * SCATTER_CONFIG.SCATTER_DISTANCE_Y_FACTOR;
-                  const randomX = (Math.random() - 0.5) * SCATTER_CONFIG.RANDOM_OFFSET;
-                  const randomY = (Math.random() - 0.5) * SCATTER_CONFIG.RANDOM_OFFSET_Y;
-                  const finalX = offsetX + randomX;
-                  const finalY = offsetY + randomY;
-                  const rotation = (Math.random() - 0.5) * SCATTER_CONFIG.ROTATION_RANGE;
-                  const scale = gsap.utils.random(SCATTER_CONFIG.SCALE_MIN, SCATTER_CONFIG.SCALE_MAX);
-  
-                  gsap.set(char, {
-                      x: finalX,
-                      y: finalY,
-                      rotation: rotation,
-                      scale: scale,
-                      force3D: true
-                  });
-              });
-          }
-  
-          scatterNow();
-  
-          return { split, scatterNow };
-      }
-  
-      const { split, scatterNow } = setupScatter(textElement);
-  
-      const tl = gsap.timeline({
-          defaults: { ease: 'none' },
-          scrollTrigger: {
-              trigger: textElement,
-              start: 'top 80%',
-              end: 'bottom 10%',
-              scrub: 1,
-              markers: SCATTER_CONFIG.DEBUG_MARKERS,
-              invalidateOnRefresh: true
-          }
-      });
-  
-      const chars = split.chars.filter(c => c && c.textContent.trim() !== '');
-      tl.to(chars, {
-          x: 0,
-          y: 0,
-          rotation: 0,
-          scale: 1,
-          duration: SCATTER_CONFIG.CHAR_DURATION,
-          stagger: {
-              each: SCATTER_CONFIG.CHAR_STAGGER,
-              from: 'start'
-          }
-      }, 0);
-  
-      window.addEventListener('resize', () => {
-          scatterNow();
-          ScrollTrigger.refresh();
-      });
-  }
   
   // Sticky Scatter Animation für data-add Elemente
   function initStickyScatterAnimation() {
@@ -713,7 +600,6 @@ if (typeof gsap === 'undefined') {
   
   // Initialisierung aller Animationen
   function initAllAnimations() {
-      initScatterAnimation();
       initStickyScatterAnimation();
       initChallengesAnimation();
       initFooterParallax();
@@ -741,7 +627,6 @@ if (typeof gsap === 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
       initLenis();
       // initScrollToAnchorLenis();
-      initScatterAnimation();
       initStickyScatterAnimation();
       initChallengesAnimation();
       initFooterParallax();
@@ -755,7 +640,6 @@ if (typeof gsap === 'undefined') {
       document.addEventListener('DOMContentLoaded', () => {
           initLenis();
           // initScrollToAnchorLenis();
-          initScatterAnimation();
           initStickyScatterAnimation();
           initChallengesAnimation();
           initFooterParallax();
@@ -765,7 +649,6 @@ if (typeof gsap === 'undefined') {
   } else {
       initLenis();
       // initScrollToAnchorLenis();
-      initScatterAnimation();
       initStickyScatterAnimation();
       initChallengesAnimation();
       initFooterParallax();
@@ -780,7 +663,6 @@ if (typeof gsap === 'undefined') {
   setTimeout(() => {
       initLenis();
       initScrollToAnchorLenis();
-      initScatterAnimation();
       initStickyScatterAnimation();
       initChallengesAnimation();
       initFooterParallax();
