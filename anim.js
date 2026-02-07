@@ -753,6 +753,45 @@ if (typeof gsap === 'undefined') {
       }
   }
   
+  // Challenges Illustration Parallax (paths)
+  function initChallengesIllustrationAnimation() {
+      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+  
+      document.querySelectorAll('.challenges_illu').forEach((component) => {
+          if (component.dataset.scriptInitialized) return;
+          component.dataset.scriptInitialized = 'true';
+  
+          const pathOne = component.querySelector('.c_path_one');
+          const pathTwo = component.querySelector('.c_path_two');
+          const pathThree = component.querySelector('.c_path_three');
+  
+          gsap.timeline({
+              scrollTrigger: {
+                  trigger: component,
+                  start: 'top 80%',
+                  end: 'bottom top',
+                  scrub: 1,
+                  markers: false
+              }
+          })
+          .to(pathOne, {
+              y: -20,
+              x: 10,
+              ease: 'none'
+          }, 0)
+          .to(pathTwo, {
+              y: 15,
+              x: -8,
+              ease: 'none'
+          }, 0)
+          .to(pathThree, {
+              y: -25,
+              x: 5,
+              ease: 'none'
+          }, 0);
+      });
+  }
+  
   // =========================================================
   // 05) INITIALISIERUNG
   // =========================================================
@@ -762,6 +801,7 @@ if (typeof gsap === 'undefined') {
       initContentRevealScroll();
       initArrowPathAnimation();
       initChallengesAnimation();
+      initChallengesIllustrationAnimation();
       initFooterParallax();
       initPartnersTitle();
   }
@@ -791,6 +831,7 @@ if (typeof gsap === 'undefined') {
       initContentRevealScroll();
       initArrowPathAnimation();
       initChallengesAnimation();
+      initChallengesIllustrationAnimation();
       initFooterParallax();
       initPartnersTitle();
       handleChallengesResize(); // Challenges Animation basierend auf Screen-Größe
@@ -806,6 +847,7 @@ if (typeof gsap === 'undefined') {
           initContentRevealScroll();
           initArrowPathAnimation();
           initChallengesAnimation();
+          initChallengesIllustrationAnimation();
           initFooterParallax();
           initPartnersTitle();
           handleChallengesResize();
@@ -817,6 +859,7 @@ if (typeof gsap === 'undefined') {
       initContentRevealScroll();
       initArrowPathAnimation();
       initChallengesAnimation();
+      initChallengesIllustrationAnimation();
       initFooterParallax();
       initPartnersTitle();
       handleChallengesResize();
@@ -833,6 +876,7 @@ if (typeof gsap === 'undefined') {
       initContentRevealScroll();
       initArrowPathAnimation();
       initChallengesAnimation();
+      initChallengesIllustrationAnimation();
       initFooterParallax();
       initPartnersTitle();
       handleChallengesResize();
