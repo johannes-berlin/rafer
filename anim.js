@@ -381,6 +381,30 @@ if (typeof gsap === 'undefined') {
       return () => ctx.revert();
   }
   
+  // Global Path Animation (data-anim-arrow)
+  function initArrowPathAnimation() {
+      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+  
+      document.querySelectorAll('[data-anim-arrow]').forEach((path) => {
+          if (typeof path.getTotalLength !== 'function') return;
+  
+          const length = path.getTotalLength();
+          gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+  
+          gsap.to(path, {
+              strokeDashoffset: 0,
+              ease: 'none',
+              duration: 3,
+              scrollTrigger: {
+                  trigger: path.closest('svg') || path,
+                  start: 'top 80%',
+                  end: 'bottom 30%',
+                  scrub: false
+              }
+          });
+      });
+  }
+  
   // Footer Parallax & Scatter Animation
   function initFooterParallax() {
       const FOOTER_CONFIG = {
@@ -736,6 +760,7 @@ if (typeof gsap === 'undefined') {
   function initAllAnimations() {
       initStickyScatterAnimation();
       initContentRevealScroll();
+      initArrowPathAnimation();
       initChallengesAnimation();
       initFooterParallax();
       initPartnersTitle();
@@ -764,6 +789,7 @@ if (typeof gsap === 'undefined') {
       // initScrollToAnchorLenis();
       initStickyScatterAnimation();
       initContentRevealScroll();
+      initArrowPathAnimation();
       initChallengesAnimation();
       initFooterParallax();
       initPartnersTitle();
@@ -778,6 +804,7 @@ if (typeof gsap === 'undefined') {
           // initScrollToAnchorLenis();
           initStickyScatterAnimation();
           initContentRevealScroll();
+          initArrowPathAnimation();
           initChallengesAnimation();
           initFooterParallax();
           initPartnersTitle();
@@ -788,6 +815,7 @@ if (typeof gsap === 'undefined') {
       // initScrollToAnchorLenis();
       initStickyScatterAnimation();
       initContentRevealScroll();
+      initArrowPathAnimation();
       initChallengesAnimation();
       initFooterParallax();
       initPartnersTitle();
@@ -803,6 +831,7 @@ if (typeof gsap === 'undefined') {
       initScrollToAnchorLenis();
       initStickyScatterAnimation();
       initContentRevealScroll();
+      initArrowPathAnimation();
       initChallengesAnimation();
       initFooterParallax();
       initPartnersTitle();
