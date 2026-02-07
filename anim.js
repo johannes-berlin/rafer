@@ -792,6 +792,36 @@ if (typeof gsap === 'undefined') {
       });
   }
   
+  // Nav ausblenden, wenn Footer in View kommt
+  function initNavHideOnFooter() {
+      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+  
+      const nav = document.querySelector('.nav');
+      const footer = document.querySelector('.footer_wrap');
+      if (!nav || !footer) return;
+  
+      ScrollTrigger.create({
+          trigger: footer,
+          start: 'top 80%',
+          onEnter: () => {
+              gsap.to(nav, {
+                  yPercent: -100,
+                  autoAlpha: 0,
+                  duration: 0.5,
+                  ease: 'power2.out'
+              });
+          },
+          onLeaveBack: () => {
+              gsap.to(nav, {
+                  yPercent: 0,
+                  autoAlpha: 1,
+                  duration: 0.5,
+                  ease: 'power2.out'
+              });
+          }
+      });
+  }
+  
   // =========================================================
   // 05) INITIALISIERUNG
   // =========================================================
@@ -802,6 +832,7 @@ if (typeof gsap === 'undefined') {
       initArrowPathAnimation();
       initChallengesAnimation();
       initChallengesIllustrationAnimation();
+      initNavHideOnFooter();
       initFooterParallax();
       initPartnersTitle();
   }
@@ -832,6 +863,7 @@ if (typeof gsap === 'undefined') {
       initArrowPathAnimation();
       initChallengesAnimation();
       initChallengesIllustrationAnimation();
+      initNavHideOnFooter();
       initFooterParallax();
       initPartnersTitle();
       handleChallengesResize(); // Challenges Animation basierend auf Screen-Größe
@@ -848,6 +880,7 @@ if (typeof gsap === 'undefined') {
           initArrowPathAnimation();
           initChallengesAnimation();
           initChallengesIllustrationAnimation();
+          initNavHideOnFooter();
           initFooterParallax();
           initPartnersTitle();
           handleChallengesResize();
@@ -860,6 +893,7 @@ if (typeof gsap === 'undefined') {
       initArrowPathAnimation();
       initChallengesAnimation();
       initChallengesIllustrationAnimation();
+      initNavHideOnFooter();
       initFooterParallax();
       initPartnersTitle();
       handleChallengesResize();
@@ -877,6 +911,7 @@ if (typeof gsap === 'undefined') {
       initArrowPathAnimation();
       initChallengesAnimation();
       initChallengesIllustrationAnimation();
+      initNavHideOnFooter();
       initFooterParallax();
       initPartnersTitle();
       handleChallengesResize();
