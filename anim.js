@@ -143,6 +143,8 @@ if (typeof gsap === 'undefined') {
   // =========================================================
   // Sticky Scatter Animation für data-add Elemente
   function initStickyScatterAnimation() {
+      const initialScrollX = window.scrollX || 0;
+      const initialScrollY = window.scrollY || 0;
       const textElements = document.querySelectorAll('[data-add]');
       const stickyTrigger = document.querySelector('.sticky_trigger');
       
@@ -261,6 +263,11 @@ if (typeof gsap === 'undefined') {
               ScrollTrigger.refresh();
           });
       });
+
+      // Sicherheitsnetz: Scroll-Position nach Init wiederherstellen
+      if (window.scrollX !== initialScrollX || window.scrollY !== initialScrollY) {
+          window.scrollTo(initialScrollX, initialScrollY);
+      }
   }
   
   // Global Content Reveal (data-reveal-group)
