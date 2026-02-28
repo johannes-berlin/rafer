@@ -799,24 +799,24 @@ if (typeof gsap === 'undefined') {
               }
           })
           .to(pathOne, {
-              y: 40,
-              x: 30,
-              rotate: 6,
-              scale: 1.08,
+            y: 120,
+            x: 150,
+            rotate: 25,
+            scale: 1.4,
               ease: 'none'
           }, 0)
           .to(pathTwo, {
-              y: 60,
-              x: -20,
-              rotate: -5,
-              scale: 1.12,
+            y: -100,
+            x: -180,
+            rotate: -30,
+            scale: 0.6,
               ease: 'none'
           }, 0)
           .to(pathThree, {
-              y: 80,
-              x: -30,
-              rotate: 8,
-              scale: 1.15,
+            y: 160,
+            x: -120,
+            rotate: 40,
+            scale: 1.6,
               ease: 'none'
           }, 0);
       });
