@@ -784,7 +784,11 @@ if (typeof gsap === 'undefined') {
           const pathTwo = component.querySelector('.c_path_two');
           const pathThree = component.querySelector('.c_path_three');
 
-          // Overflow clipping vermeiden – Pfade bewegen sich nur nach unten/seitlich
+          // transform-origin setzen damit scale/rotate sichtbar wird
+          gsap.set([pathOne, pathTwo, pathThree], {
+              transformOrigin: 'center center'
+          });
+
           gsap.timeline({
               scrollTrigger: {
                   trigger: component,
