@@ -776,47 +776,47 @@ if (typeof gsap === 'undefined') {
   
   // Challenges Illustration Parallax (paths)
   function initChallengesIllustrationAnimation() {
-    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-    document.querySelectorAll('.challenges_illu').forEach((component) => {
-        if (component.dataset.scriptInitialized) return;
-        component.dataset.scriptInitialized = 'true';
-        const pathOne = component.querySelector('.c_path_one');
-        const pathTwo = component.querySelector('.c_path_two');
-        const pathThree = component.querySelector('.c_path_three');
+      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+      document.querySelectorAll('.challenges_illu').forEach((component) => {
+          if (component.dataset.scriptInitialized) return;
+          component.dataset.scriptInitialized = 'true';
+          const pathOne = component.querySelector('.c_path_one');
+          const pathTwo = component.querySelector('.c_path_two');
+          const pathThree = component.querySelector('.c_path_three');
 
-        gsap.timeline({
-            scrollTrigger: {
-                trigger: component,
-                start: 'top 85%',
-                end: 'bottom 10%',
-                scrub: 0.8,
-                markers: false
-            }
-        })
-        // Deutlich mehr Versatz zwischen den Pfaden → stärkerer Parallax-Effekt
-        .to(pathOne, {
-            y: -60,
-            x: 25,
-            rotate: 2,
-            scale: 1.03,
-            ease: 'none'
-        }, 0)
-        .to(pathTwo, {
-            y: -30,
-            x: -15,
-            rotate: -1.5,
-            scale: 0.98,
-            ease: 'none'
-        }, 0)
-        .to(pathThree, {
-            y: -90,
-            x: -20,
-            rotate: 3,
-            scale: 1.05,
-            ease: 'none'
-        }, 0);
-    });
-}
+          // Overflow clipping vermeiden – Pfade bewegen sich nur nach unten/seitlich
+          gsap.timeline({
+              scrollTrigger: {
+                  trigger: component,
+                  start: 'top 85%',
+                  end: 'bottom 10%',
+                  scrub: 0.8,
+                  markers: false
+              }
+          })
+          .to(pathOne, {
+              y: 40,
+              x: 30,
+              rotate: 6,
+              scale: 1.08,
+              ease: 'none'
+          }, 0)
+          .to(pathTwo, {
+              y: 60,
+              x: -20,
+              rotate: -5,
+              scale: 1.12,
+              ease: 'none'
+          }, 0)
+          .to(pathThree, {
+              y: 80,
+              x: -30,
+              rotate: 8,
+              scale: 1.15,
+              ease: 'none'
+          }, 0);
+      });
+  }
   
   // Nav ausblenden, wenn Footer in View kommt
   function initNavHideOnFooter() {
