@@ -856,23 +856,24 @@ if (typeof gsap === 'undefined') {
   function initEyebrowMarkerAnimation() {
       if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
   
-      document.querySelectorAll('[class*="eyebrow_marker"]').forEach((svg) => {
-          const paths = svg.querySelectorAll('path');
-          if (!paths.length) return;
+      const markers = [
+          '.eyebrow_marker_one-svg',
+          '.eyebrow_marker_two-svg',
+          '.eyebrow_marker_three-svg'
+      ];
   
-          paths.forEach((path) => {
-              const length = path.getTotalLength();
-              gsap.set(path, {
-                  strokeDasharray: length,
-                  strokeDashoffset: length
-              });
+      markers.forEach((selector) => {
+          const svg = document.querySelector(selector);
+          if (!svg) return;
+  
+          gsap.set(svg, {
+              clipPath: 'inset(0 0 100% 0)'
           });
   
-          gsap.to(paths, {
-              strokeDashoffset: 0,
-              duration: 1,
+          gsap.to(svg, {
+              clipPath: 'inset(0 0 0% 0)',
+              duration: 1.2,
               ease: 'power2.out',
-              stagger: 0.15,
               scrollTrigger: {
                   trigger: svg,
                   start: 'top 85%',
