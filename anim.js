@@ -147,6 +147,7 @@ if (typeof gsap === 'undefined') {
       const initialScrollY = window.scrollY || 0;
       const textElements = document.querySelectorAll('[data-add]');
       const stickyTrigger = document.querySelector('.sticky_trigger');
+      const stickyCta = document.querySelector('.sticky_cta');
       
       if (!stickyTrigger) {
           console.log('.sticky_trigger nicht gefunden');
@@ -243,6 +244,10 @@ if (typeof gsap === 'undefined') {
               }
           });
           
+          if (stickyCta) {
+              gsap.set(stickyCta, { y: 20, autoAlpha: 0 });
+          }
+          
           // Animation zu geordnetem Zustand
           split.chars.forEach((char, i) => {
               if (char.textContent.trim() === '') return;
@@ -256,6 +261,15 @@ if (typeof gsap === 'undefined') {
                   ease: "linear",
               }, i * 0.02);
           });
+          
+          if (stickyCta) {
+              tl.to(stickyCta, {
+                  y: 0,
+                  autoAlpha: 1,
+                  duration: 0.6,
+                  ease: "power2.out"
+              }, ">");
+          }
           
           // Responsive Anpassung
           window.addEventListener('resize', () => {
