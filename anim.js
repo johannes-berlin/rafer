@@ -867,11 +867,14 @@ if (typeof gsap === 'undefined') {
           if (!svg) return;
   
           gsap.set(svg, {
-              clipPath: 'inset(0 0 100% 0)'
+              clipPath: 'inset(0 0 100% 0)',
+              webkitClipPath: 'inset(0 0 100% 0)',
+              willChange: 'clip-path'
           });
   
           gsap.to(svg, {
               clipPath: 'inset(0 0 0% 0)',
+              webkitClipPath: 'inset(0 0 0% 0)',
               duration: 1.2,
               ease: 'power2.out',
               scrollTrigger: {
