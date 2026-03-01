@@ -4,6 +4,13 @@
 // =========================================================
 // 01) BASIS & DEPENDENCIES
 // =========================================================
+// FOUC vermeiden: wichtige Elemente initial ausblenden
+if (!document.getElementById('animjs-initial-visibility')) {
+    const styleEl = document.createElement('style');
+    styleEl.id = 'animjs-initial-visibility';
+    styleEl.textContent = '.nav,.sticky_wrap{visibility:hidden;}';
+    document.head.appendChild(styleEl);
+}
 
 // Registriere ScrollTrigger Plugin
 if (typeof gsap === 'undefined') {
@@ -147,6 +154,7 @@ if (typeof gsap === 'undefined') {
       const initialScrollY = window.scrollY || 0;
       const textElements = document.querySelectorAll('[data-add]');
       const stickyTrigger = document.querySelector('.sticky_trigger');
+      const stickyWrap = document.querySelector('.sticky_wrap');
       const stickyCta = document.querySelector('.sticky_cta');
       
       if (!stickyTrigger) {
@@ -190,6 +198,7 @@ if (typeof gsap === 'undefined') {
           
           // Sofort verteilen (ohne Animation)
           setScatteredPositions();
+          if (stickyWrap) gsap.set(stickyWrap, { autoAlpha: 1 });
           
           function setScatteredPositions() {
               const containerRect = textElement.getBoundingClientRect();
