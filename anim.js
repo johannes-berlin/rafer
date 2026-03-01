@@ -898,6 +898,11 @@ if (typeof gsap === 'undefined') {
       const clipRect = document.querySelector('#reveal-clip rect');
       if (!heroTitle || !clipRect) return;
   
+      // FOUC vermeiden: Elemente sofort verstecken
+      gsap.set(heroTitle, { autoAlpha: 0 });
+      if (nav) gsap.set(nav, { yPercent: -100, autoAlpha: 0 });
+      gsap.set(clipRect, { attr: { height: 0 } });
+
       const split = (typeof SplitText !== 'undefined')
           ? new SplitText(heroTitle, { type: 'chars', charsClass: 'char' })
           : createSplitText(heroTitle);
@@ -905,8 +910,6 @@ if (typeof gsap === 'undefined') {
   
       gsap.set(heroTitle, { autoAlpha: 1 });
       gsap.set(chars, { autoAlpha: 0, y: 12, rotation: 0 });
-      gsap.set(clipRect, { attr: { height: 0 } });
-      if (nav) gsap.set(nav, { yPercent: -100 });
   
       const tl = gsap.timeline();
   
