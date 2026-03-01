@@ -933,6 +933,7 @@ if (typeof gsap === 'undefined') {
       if (nav) {
           tl.to(nav, {
               yPercent: 0,
+              autoAlpha: 1,
               duration: 0.6,
               ease: 'power2.out'
           }, '-=0.6');
