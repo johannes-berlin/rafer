@@ -889,6 +889,53 @@ if (typeof gsap === 'undefined') {
       });
   }
   
+  // Page Loader Animation
+  function initPageLoaderAnimation() {
+      if (typeof gsap === 'undefined') return;
+  
+      const heroTitle = document.querySelector('.hero_main_title');
+      const nav = document.querySelector('.nav');
+      const clipRect = document.querySelector('#reveal-clip rect');
+      if (!heroTitle || !clipRect) return;
+  
+      const split = (typeof SplitText !== 'undefined')
+          ? new SplitText(heroTitle, { type: 'chars', charsClass: 'char' })
+          : createSplitText(heroTitle);
+      const chars = split.chars || [];
+  
+      gsap.set(heroTitle, { autoAlpha: 1 });
+      gsap.set(chars, { autoAlpha: 0, y: 12, rotation: 0 });
+      gsap.set(clipRect, { attr: { height: 0 } });
+      if (nav) gsap.set(nav, { yPercent: -100 });
+  
+      const tl = gsap.timeline();
+  
+      // Random reveal der Buchstaben
+      tl.to(chars, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.35,
+          ease: 'power2.out',
+          stagger: { each: 0.03, from: 'random' }
+      });
+  
+      // Clip Reveal
+      tl.to(clipRect, {
+          attr: { height: 571 },
+          duration: 2,
+          ease: 'power2.inOut'
+      }, '<+=0.1');
+  
+      // Nav reinfahren
+      if (nav) {
+          tl.to(nav, {
+              yPercent: 0,
+              duration: 0.6,
+              ease: 'power2.out'
+          }, '-=0.6');
+      }
+  }
+  
   // =========================================================
   // 05) INITIALISIERUNG
   // =========================================================
@@ -901,6 +948,7 @@ if (typeof gsap === 'undefined') {
       initChallengesIllustrationAnimation();
       initNavHideOnFooter();
       initEyebrowMarkerAnimation();
+      initPageLoaderAnimation();
       initFooterParallax();
       initPartnersTitle();
   }
@@ -933,6 +981,7 @@ if (typeof gsap === 'undefined') {
       initChallengesIllustrationAnimation();
       initNavHideOnFooter();
       initEyebrowMarkerAnimation();
+      initPageLoaderAnimation();
       initFooterParallax();
       initPartnersTitle();
       handleChallengesResize(); // Challenges Animation basierend auf Screen-Größe
@@ -951,6 +1000,7 @@ if (typeof gsap === 'undefined') {
           initChallengesIllustrationAnimation();
           initNavHideOnFooter();
           initEyebrowMarkerAnimation();
+          initPageLoaderAnimation();
           initFooterParallax();
           initPartnersTitle();
           handleChallengesResize();
@@ -965,6 +1015,7 @@ if (typeof gsap === 'undefined') {
       initChallengesIllustrationAnimation();
       initNavHideOnFooter();
       initEyebrowMarkerAnimation();
+      initPageLoaderAnimation();
       initFooterParallax();
       initPartnersTitle();
       handleChallengesResize();
@@ -984,6 +1035,7 @@ if (typeof gsap === 'undefined') {
       initChallengesIllustrationAnimation();
       initNavHideOnFooter();
       initEyebrowMarkerAnimation();
+      initPageLoaderAnimation();
       initFooterParallax();
       initPartnersTitle();
       handleChallengesResize();
