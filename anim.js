@@ -936,122 +936,6 @@ if (typeof gsap === 'undefined') {
       }
   }
   
-  // Locale Switcher (Flags + Dropdown)
-  function initLocaleSwitcher() {
-      function sketchFlag(paths) {
-          return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 24" width="28" height="20" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="display:block">' + paths + '</svg>';
-      }
-  
-      const FLAGS = {
-          en: sketchFlag('<rect x="1" y="1" width="30" height="22" rx="2" stroke-width="1.6"/><line x1="16" y1="1" x2="16" y2="23" stroke-width="2.2"/><line x1="1" y1="12" x2="31" y2="12" stroke-width="2.2"/><line x1="1" y1="1" x2="31" y2="23" stroke-width="1.2"/><line x1="31" y1="1" x2="1" y2="23" stroke-width="1.2"/>'),
-          de: sketchFlag('<rect x="1" y="1" width="30" height="22" rx="2" stroke-width="1.6"/><path d="M1 8.5 Q8 8 16 8.5 T31 8.5" stroke-width="1.3"/><path d="M1 15.5 Q10 15 16 15.5 T31 15.5" stroke-width="1.3"/><line x1="3" y1="4.5" x2="12" y2="4.5" stroke-width="3" opacity="0.7"/><line x1="14" y1="5" x2="28" y2="4.5" stroke-width="3" opacity="0.7"/>'),
-          pt: sketchFlag('<rect x="1" y="1" width="30" height="22" rx="2" stroke-width="1.6"/><path d="M12 1.5 Q12.5 8, 12 12 T12 22.5" stroke-width="1.3"/><circle cx="12" cy="12" r="3.5" stroke-width="1.4"/><circle cx="12" cy="12" r="1.5" stroke-width="1"/>')
-      };
-  
-      const LOCALES = [
-          { code: 'en', href: '/', flag: FLAGS.en, label: 'EN', fullName: 'English' },
-          { code: 'de', href: '/de', flag: FLAGS.de, label: 'DE', fullName: 'Deutsch' },
-          { code: 'pt', href: '/pt', flag: FLAGS.pt, label: 'PT', fullName: 'Português' }
-      ];
-  
-      const CHECKMARK = '<svg width="14" height="12" viewBox="0 0 14 12" fill="none"><path d="M0.5 6.5H1V7H1.5V7.5H2V8H2.5V8.5H3V9H3.5V9.5H4V10H4.5V10.5H5V11H5.5V11.5H6V11H6.5V10.5H7V10H7.5V9.5H8V9H8.5V8.5H9V8H9.5V7.5H10V7H10.5V6.5H11V6H11.5V5.5H12V5H12.5V4.5H13V4H13.5V3.5V3V2.5V2H13V2.5H12.5V3H12V3.5H11.5V4H11V4.5H10.5V5H10V5.5H9.5V6H9V6.5H8.5V7H8V7.5H7.5V8H7V8.5H6.5V9H6V8.5H5.5V8H5V7.5H4.5V7H4V6.5H3.5V6H3V5.5H2.5V5H2V5.5H1.5V6H1V6.5H0.5Z" fill="currentColor"/></svg>';
-  
-      function getCurrentLocale() {
-          const path = window.location.pathname;
-          const htmlLang = document.documentElement.lang;
-          for (let i = 0; i < LOCALES.length; i++) {
-              const locPath = new URL(LOCALES[i].href, window.location.origin).pathname;
-              if (path === locPath || path.startsWith(locPath + '/')) return LOCALES[i];
-          }
-          if (htmlLang) {
-              const code = htmlLang.split('-')[0].toLowerCase();
-              const match = LOCALES.find((l) => l.code === code);
-              if (match) return match;
-          }
-          return LOCALES[0];
-      }
-  
-      function scatterText(text) {
-          return text.split('').map((c, i) => {
-              const tx = (Math.random() - 0.5) * 8;
-              const ty = (Math.random() - 0.5) * 6;
-              const tr = (Math.random() - 0.5) * 12;
-              return '<span class="text-char" style="--tx:' + tx + 'px;--ty:' + ty + 'px;--tr:' + tr + 'deg;animation-delay:' + (i * 0.03) + 's">' + (c === ' ' ? '&nbsp;' : c) + '</span>';
-          }).join('');
-      }
-  
-      function init() {
-          const current = getCurrentLocale();
-          document.querySelectorAll('.locale-switcher').forEach((switcher) => {
-              const dropdown = switcher.querySelector('.locale-dropdown');
-              const trigger = switcher.querySelector('.locale-trigger');
-              if (!dropdown || !trigger) return;
-  
-              const currentFlag = trigger.querySelector('.current-flag');
-              const currentLabel = trigger.querySelector('.current-label');
-              if (currentFlag) currentFlag.innerHTML = current.flag;
-              if (currentLabel) currentLabel.textContent = current.label;
-  
-              dropdown.innerHTML = '';
-              LOCALES.forEach((loc) => {
-                  const btn = document.createElement('button');
-                  btn.className = 'locale-option' + (loc.code === current.code ? ' active' : '');
-                  btn.setAttribute('role', 'option');
-                  btn.setAttribute('aria-selected', loc.code === current.code);
-                  btn.innerHTML = '<span class="flag">' + loc.flag + '</span>' +
-                      '<span class="name">' + scatterText(loc.fullName) + '</span>' +
-                      '<span class="check">' + CHECKMARK + '</span>';
-  
-                  btn.addEventListener('click', () => {
-                      window.location.href = loc.href;
-                  });
-                  dropdown.appendChild(btn);
-              });
-  
-              trigger.addEventListener('click', (e) => {
-                  e.stopPropagation();
-                  const isOpen = switcher.classList.contains('open');
-                  document.querySelectorAll('.locale-switcher.open').forEach((s) => {
-                      s.classList.remove('open');
-                      const t = s.querySelector('.locale-trigger');
-                      if (t) t.setAttribute('aria-expanded', 'false');
-                  });
-                  if (!isOpen) {
-                      switcher.classList.add('open');
-                      trigger.setAttribute('aria-expanded', 'true');
-                  }
-              });
-          });
-  
-          document.addEventListener('click', () => {
-              document.querySelectorAll('.locale-switcher.open').forEach((s) => {
-                  s.classList.remove('open');
-                  const t = s.querySelector('.locale-trigger');
-                  if (t) t.setAttribute('aria-expanded', 'false');
-              });
-          });
-  
-          document.addEventListener('keydown', (e) => {
-              if (e.key === 'Escape') {
-                  document.querySelectorAll('.locale-switcher.open').forEach((s) => {
-                      s.classList.remove('open');
-                      const t = s.querySelector('.locale-trigger');
-                      if (t) t.setAttribute('aria-expanded', 'false');
-                  });
-              }
-          });
-  
-          document.querySelectorAll('.locale-dropdown').forEach((dd) => {
-              dd.addEventListener('click', (e) => { e.stopPropagation(); });
-          });
-      }
-  
-      if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', init);
-      } else {
-          init();
-      }
-  }
   
   // =========================================================
   // 05) INITIALISIERUNG
@@ -1066,7 +950,6 @@ if (typeof gsap === 'undefined') {
       initNavHideOnFooter();
       initEyebrowMarkerAnimation();
       initPageLoaderAnimation();
-      initLocaleSwitcher();
       initFooterParallax();
       initPartnersTitle();
   }
@@ -1100,7 +983,6 @@ if (typeof gsap === 'undefined') {
       initNavHideOnFooter();
       initEyebrowMarkerAnimation();
       initPageLoaderAnimation();
-      initLocaleSwitcher();
       initFooterParallax();
       initPartnersTitle();
       handleChallengesResize(); // Challenges Animation basierend auf Screen-Größe
@@ -1120,7 +1002,6 @@ if (typeof gsap === 'undefined') {
           initNavHideOnFooter();
           initEyebrowMarkerAnimation();
           initPageLoaderAnimation();
-          initLocaleSwitcher();
           initFooterParallax();
           initPartnersTitle();
           handleChallengesResize();
@@ -1136,7 +1017,6 @@ if (typeof gsap === 'undefined') {
       initNavHideOnFooter();
       initEyebrowMarkerAnimation();
       initPageLoaderAnimation();
-      initLocaleSwitcher();
       initFooterParallax();
       initPartnersTitle();
       handleChallengesResize();
@@ -1157,7 +1037,6 @@ if (typeof gsap === 'undefined') {
       initNavHideOnFooter();
       initEyebrowMarkerAnimation();
       initPageLoaderAnimation();
-      initLocaleSwitcher();
       initFooterParallax();
       initPartnersTitle();
       handleChallengesResize();
