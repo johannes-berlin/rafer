@@ -68,12 +68,7 @@ if (typeof gsap === 'undefined') {
     }
   }
   
-  // Scroll-To Anchor Lenis
-  // iOS-Erkennung gemäß Fix
-  function isIOS() {
-    const ua = navigator.userAgent || navigator.vendor || window.opera;
-    return /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  }
+  // (iOS-Erkennung entfernt)
   
   // (Scroll-To Anchor Lenis entfernt)
   
