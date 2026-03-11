@@ -148,150 +148,6 @@ if (typeof gsap === 'undefined') {
   // =========================================================
   // 04) ANIMATIONEN
   // =========================================================
-  // Sticky Scatter Animation für data-add Elemente
-  function initStickyScatterAnimation() {
-      const initialScrollX = window.scrollX || 0;
-      const initialScrollY = window.scrollY || 0;
-      const textElements = document.querySelectorAll('[data-add]');
-      const stickyTrigger = document.querySelector('.sticky_trigger');
-      const stickyWrap = document.querySelector('.sticky_wrap');
-      const stickyCta = document.querySelector('.sticky_cta');
-      
-      if (!stickyTrigger) {
-          console.log('.sticky_trigger nicht gefunden');
-          return;
-      }
-      
-      if (textElements.length === 0) {
-          console.log('Keine Elemente mit data-add gefunden');
-          return;
-      }
-      
-      textElements.forEach((textElement) => {
-          let split;
-          let scatteredStates = [];
-          
-          // Text aufteilen
-          if (typeof SplitText !== 'undefined') {
-              split = new SplitText(textElement, { 
-                  type: 'chars,words',
-                  charsClass: 'char',
-                  wordsClass: 'word'
-              });
-          } else {
-              split = createSplitText(textElement);
-          }
-          
-          // Basis-Styling setzen
-          gsap.set(split.chars, {
-              position: 'relative',
-              display: 'inline-block'
-          });
-          
-          // Wörter als inline-block setzen um Umbruch zu verhindern
-          if (split.words) {
-              gsap.set(split.words, {
-                  display: 'inline-block',
-                  whiteSpace: 'nowrap'
-              });
-          }
-          
-          // Sofort verteilen (ohne Animation)
-          setScatteredPositions();
-          if (stickyWrap) gsap.set(stickyWrap, { autoAlpha: 1 });
-          
-          function setScatteredPositions() {
-              const containerRect = textElement.getBoundingClientRect();
-              scatteredStates = [];
-              
-              split.chars.forEach((char, i) => {
-                  if (char.textContent.trim() === '') {
-                      scatteredStates.push({ x: 0, y: 0, rotation: 0, scale: 1 });
-                      return;
-                  }
-                  
-                  // Zufällige Position um das Element
-                  const angle = Math.random() * Math.PI * 2;
-                  const distance = Math.random() * 120;
-                  const offsetX = Math.cos(angle) * distance;
-                  const offsetY = Math.sin(angle) * distance * 0.6;
-                  
-                  const randomX = (Math.random() - 0.5) * 100;
-                  const randomY = (Math.random() - 0.5) * 60;
-                  
-                  const finalX = offsetX + randomX;
-                  const finalY = offsetY + randomY;
-                  const rotation = (Math.random() - 0.5) * 60;
-                  const scale = gsap.utils.random(0.8, 1.2);
-                  
-                  scatteredStates.push({ 
-                      x: finalX, 
-                      y: finalY, 
-                      rotation: rotation, 
-                      scale: scale 
-                  });
-                  
-                  // Sofort in scattered Position setzen
-                  gsap.set(char, {
-                      x: finalX,
-                      y: finalY,
-                      rotation: rotation,
-                      scale: scale
-                  });
-              });
-          }
-          
-          const tl = gsap.timeline({
-              defaults: { ease: "none" },
-              scrollTrigger: {
-                  trigger: stickyTrigger,
-                  start: "top top",
-                  end: "bottom center",
-                  scrub: 1,
-                  anticipatePin: 1,
-                  invalidateOnRefresh: true,
-              }
-          });
-          
-          if (stickyCta) {
-              gsap.set(stickyCta, { y: 20, autoAlpha: 0 });
-          }
-          
-          // Animation zu geordnetem Zustand
-          split.chars.forEach((char, i) => {
-              if (char.textContent.trim() === '') return;
-              
-              tl.to(char, {
-                  x: 0,
-                  y: 0,
-                  rotation: 0,
-                  scale: 1,
-                  duration: 1,
-                  ease: "linear",
-              }, i * 0.02);
-          });
-          
-          if (stickyCta) {
-              tl.to(stickyCta, {
-                  y: 0,
-                  autoAlpha: 1,
-                  duration: 0.6,
-                  ease: "power2.out"
-              }, ">");
-          }
-          
-          // Responsive Anpassung
-          window.addEventListener('resize', () => {
-              setScatteredPositions();
-              ScrollTrigger.refresh();
-          });
-      });
-
-      // Sicherheitsnetz: Scroll-Position nach Init wiederherstellen
-      if (window.scrollX !== initialScrollX || window.scrollY !== initialScrollY) {
-          window.scrollTo(initialScrollX, initialScrollY);
-      }
-  }
   
   // Global Content Reveal (data-reveal-group)
   function initContentRevealScroll() {
@@ -1039,7 +895,6 @@ if (typeof gsap === 'undefined') {
   // =========================================================
   // Initialisierung aller Animationen
   function initAllAnimations() {
-      initStickyScatterAnimation();
       initContentRevealScroll();
       initArrowPathAnimation();
       initChallengesAnimation();
@@ -1071,7 +926,6 @@ if (typeof gsap === 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
       initLenis();
       // initScrollToAnchorLenis();
-      initStickyScatterAnimation();
       initContentRevealScroll();
       initArrowPathAnimation();
       initChallengesAnimation();
@@ -1089,7 +943,6 @@ if (typeof gsap === 'undefined') {
       document.addEventListener('DOMContentLoaded', () => {
           initLenis();
           // initScrollToAnchorLenis();
-          initStickyScatterAnimation();
           initContentRevealScroll();
           initArrowPathAnimation();
           initChallengesAnimation();
@@ -1103,7 +956,6 @@ if (typeof gsap === 'undefined') {
   } else {
       initLenis();
       // initScrollToAnchorLenis();
-      initStickyScatterAnimation();
       initContentRevealScroll();
       initArrowPathAnimation();
       initChallengesAnimation();
@@ -1122,7 +974,6 @@ if (typeof gsap === 'undefined') {
   setTimeout(() => {
       initLenis();
       initScrollToAnchorLenis();
-      initStickyScatterAnimation();
       initContentRevealScroll();
       initArrowPathAnimation();
       initChallengesAnimation();
