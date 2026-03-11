@@ -953,6 +953,124 @@ if (typeof gsap === 'undefined') {
       });
   }
   
+  // Scatter Headline (data-scatter-headline)
+  function initScatterHeadline(container) {
+      if (!container) return;
+      const raw = container.dataset.scatterHeadline;
+      if (!raw) return;
+  
+      const ghost = container.querySelector('.scatter-headline__ghost');
+      const stage = container.querySelector('.scatter-headline__stage');
+      if (!ghost || !stage) return;
+  
+      const lines = raw.split('|');
+  
+      // Build ghost lines for measurement
+      const charSpans = [];
+      ghost.innerHTML = '';
+      lines.forEach(line => {
+          const lineEl = document.createElement('span');
+          lineEl.className = 'scatter-headline__ghost-line';
+          lineEl.style.display = 'block';
+  
+          [...line].forEach(ch => {
+              const cs = document.createElement('span');
+              cs.style.display = 'inline-block';
+              cs.style.visibility = 'hidden';
+              cs.textContent = ch === ' ' ? '\u00A0' : ch;
+              lineEl.appendChild(cs);
+              charSpans.push({ el: cs, char: ch });
+          });
+  
+          ghost.appendChild(lineEl);
+      });
+  
+      requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+              const stageRect = stage.getBoundingClientRect();
+              const letters = [];
+  
+              charSpans.forEach(({ el, char }) => {
+                  if (char === ' ') return;
+  
+                  const r = el.getBoundingClientRect();
+                  const targetX = r.left - stageRect.left + r.width * 0.5;
+                  const targetY = r.top - stageRect.top + r.height * 0.5;
+  
+                  const vw = window.innerWidth;
+                  const vh = window.innerHeight;
+                  const startX = (Math.random() - 0.5) * vw * 0.75;
+                  const startY = (Math.random() - 0.5) * vh * 0.80;
+                  const startRot = (Math.random() - 0.5) * 360;
+                  const startS = 0.4 + Math.random() * 0.8;
+  
+                  const letter = document.createElement('span');
+                  letter.className = 'scatter-letter';
+                  letter.textContent = char;
+                  stage.appendChild(letter);
+  
+                  gsap.set(letter, {
+                      x: startX,
+                      y: startY,
+                      xPercent: -50,
+                      yPercent: -50,
+                      left: targetX,
+                      top: targetY,
+                      rotation: startRot,
+                      scale: startS,
+                      opacity: 0.6,
+                  });
+  
+                  letters.push({ el: letter });
+              });
+  
+              const heroScroll = container.closest('.hero-scroll');
+              const cta = document.getElementById('heroCta');
+              const ctaLine = document.getElementById('ctaLine');
+  
+              const tl = gsap.timeline({
+                  scrollTrigger: {
+                      trigger: heroScroll || container,
+                      start: 'top top',
+                      end: '+=200%',
+                      scrub: 1.2,
+                      pin: false,
+                  }
+              });
+  
+              letters.forEach((lt, i) => {
+                  const delay = (i / letters.length) * 0.5;
+                  tl.to(lt.el, {
+                      x: 0,
+                      y: 0,
+                      rotation: 0,
+                      scale: 1,
+                      opacity: 1,
+                      ease: 'power3.out',
+                      duration: 0.6,
+                  }, delay);
+              });
+  
+              if (cta) {
+                  tl.to(cta, {
+                      opacity: 1,
+                      y: 0,
+                      ease: 'power2.out',
+                      duration: 0.25,
+                  }, '>-0.1');
+              }
+  
+              if (ctaLine) {
+                  tl.to(ctaLine, {
+                      scaleX: 1,
+                      ease: 'power2.inOut',
+                      duration: 0.2,
+                  }, '<+0.05');
+              }
+          });
+      });
+  }
+  
   // Challenges Illustration Parallax (paths)
   function initChallengesIllustrationAnimation() {
       if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
@@ -1130,6 +1248,7 @@ if (typeof gsap === 'undefined') {
       initArrowPathAnimation();
       initChallengesAnimation();
       initFlickCards();
+      document.querySelectorAll('[data-scatter-headline]').forEach(initScatterHeadline);
       initChallengesIllustrationAnimation();
       initNavHideOnFooter();
       initEyebrowMarkerAnimation();
@@ -1164,6 +1283,7 @@ if (typeof gsap === 'undefined') {
       initArrowPathAnimation();
       initChallengesAnimation();
       initFlickCards();
+      document.querySelectorAll('[data-scatter-headline]').forEach(initScatterHeadline);
       initChallengesIllustrationAnimation();
       initNavHideOnFooter();
       initEyebrowMarkerAnimation();
@@ -1184,6 +1304,7 @@ if (typeof gsap === 'undefined') {
           initArrowPathAnimation();
           initChallengesAnimation();
           initFlickCards();
+          document.querySelectorAll('[data-scatter-headline]').forEach(initScatterHeadline);
           initChallengesIllustrationAnimation();
           initNavHideOnFooter();
           initEyebrowMarkerAnimation();
@@ -1200,6 +1321,7 @@ if (typeof gsap === 'undefined') {
       initArrowPathAnimation();
       initChallengesAnimation();
       initFlickCards();
+      document.querySelectorAll('[data-scatter-headline]').forEach(initScatterHeadline);
       initChallengesIllustrationAnimation();
       initNavHideOnFooter();
       initEyebrowMarkerAnimation();
@@ -1221,6 +1343,7 @@ if (typeof gsap === 'undefined') {
       initArrowPathAnimation();
       initChallengesAnimation();
       initFlickCards();
+      document.querySelectorAll('[data-scatter-headline]').forEach(initScatterHeadline);
       initChallengesIllustrationAnimation();
       initNavHideOnFooter();
       initEyebrowMarkerAnimation();
