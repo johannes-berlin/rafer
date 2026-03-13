@@ -715,10 +715,10 @@
 
     const testimonialItems = gsap.utils.toArray('.testimonial_cms_item');
     testimonialItems.forEach((item) => {
-      const img = item.querySelector('.team_card_visual img:not(.team_card_texture)');
+      const imgs = item.querySelectorAll('.team_card_visual img, .team_card_texture');
 
-      if (img) {
-        gsap.set(img, { clipPath: 'circle(0% at 50% 50%)' });
+      if (imgs.length) {
+        gsap.set(imgs, { clipPath: 'circle(0% at 50% 50%)' });
       }
 
       const tl = gsap.timeline({
@@ -736,8 +736,8 @@
         ease: 'power2.out',
       });
 
-      if (img) {
-        tl.to(img, {
+      if (imgs.length) {
+        tl.to(imgs, {
           clipPath: 'circle(75% at 50% 50%)',
           duration: 0.6,
           ease: 'power3.out',
