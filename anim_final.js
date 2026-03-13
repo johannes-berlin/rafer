@@ -1399,6 +1399,15 @@
     if (cards.length) bindSwipe(cards[cards.length - 1]);
   }
 
+  function ensureBaseVisibility() {
+    const styleEl = document.getElementById('animjs-initial-visibility');
+    if (styleEl) styleEl.remove();
+    const nav = document.querySelector('.nav');
+    if (nav) nav.style.visibility = 'visible';
+    const stickyWrap = document.querySelector('.sticky_wrap');
+    if (stickyWrap) stickyWrap.style.visibility = 'visible';
+  }
+
   // =========================================================
   // 05) INITIALISIERUNG
   // =========================================================
@@ -1406,6 +1415,9 @@
 
   function initAllAnimations() {
     initLocaleSwitcher();
+    if (!document.body || !document.body.hasAttribute('data-home')) {
+      ensureBaseVisibility();
+    }
     if (typeof gsap === 'undefined') {
       window.addEventListener('load', initAllAnimations, { once: true });
       return;
