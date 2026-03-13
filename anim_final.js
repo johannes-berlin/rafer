@@ -1112,9 +1112,9 @@
         });
       }
 
-      function open() { switcher.classList.add('locale-switcher--open'); }
-      function close() { switcher.classList.remove('locale-switcher--open'); }
-      function toggle() { switcher.classList.contains('locale-switcher--open') ? close() : open(); }
+      function open() { switcher.classList.add('open'); }
+      function close() { switcher.classList.remove('open'); }
+      function toggle() { switcher.classList.contains('open') ? close() : open(); }
 
       trigger.addEventListener('click', e => { e.stopPropagation(); toggle(); });
       document.addEventListener('click', e => { if (!switcher.contains(e.target)) close(); });
