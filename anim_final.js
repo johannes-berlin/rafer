@@ -231,27 +231,29 @@
     return () => ctx.revert();
   }
 
-  // Global Path Animation (data-anim-arrow)
+  // Arrow Path Animation (#down)
   function initArrowPathAnimation() {
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
-    document.querySelectorAll('[data-anim-arrow]').forEach((path) => {
-      if (typeof path.getTotalLength !== 'function') return;
+    const path = document.querySelector('#down');
+    if (!path || typeof path.getTotalLength !== 'function') return;
 
-      const length = path.getTotalLength();
-      gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+    const len = path.getTotalLength();
+    gsap.set(path, {
+      strokeDasharray: len,
+      strokeDashoffset: len,
+    });
 
-      gsap.to(path, {
-        strokeDashoffset: 0,
-        ease: 'none',
-        duration: 3,
-        scrollTrigger: {
-          trigger: path.closest('svg') || path,
-          start: 'top 80%',
-          end: 'bottom 30%',
-          scrub: false
-        }
-      });
+    gsap.to(path, {
+      strokeDashoffset: 0,
+      ease: 'power2.out',
+      duration: 1.5,
+      scrollTrigger: {
+        trigger: path,
+        start: 'top 80%',
+        end: 'top 20%',
+        toggleActions: 'play none none reverse',
+      },
     });
   }
 
