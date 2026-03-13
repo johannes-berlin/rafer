@@ -1042,7 +1042,7 @@
   let __localeSwitcherInitialized = false;
   function initLocaleSwitcher() {
     function sketchFlag(paths) {
-      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 24" width="28" height="20" fill="none" stroke="#111111" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="display:block">' + paths + '</svg>';
+      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 24" width="28" height="20" fill="none" stroke="var(--_theme---text)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="display:block">' + paths + '</svg>';
     }
 
     const FLAGS = {
