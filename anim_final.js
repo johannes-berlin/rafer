@@ -1368,7 +1368,7 @@
   // 05) INITIALISIERUNG
   // =========================================================
   function initAllAnimations() {
-    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+    if (typeof gsap === 'undefined') {
       window.addEventListener('load', initAllAnimations, { once: true });
       return;
     }
