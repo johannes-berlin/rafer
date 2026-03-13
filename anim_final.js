@@ -1367,11 +1367,15 @@
   // =========================================================
   // 05) INITIALISIERUNG
   // =========================================================
+  let __animFinalInitialized = false;
+
   function initAllAnimations() {
     if (typeof gsap === 'undefined') {
       window.addEventListener('load', initAllAnimations, { once: true });
       return;
     }
+    if (__animFinalInitialized) return;
+    __animFinalInitialized = true;
     initLenis();
     initContentRevealScroll();
     initArrowPathAnimation();
@@ -1395,4 +1399,11 @@
   } else {
     initAllAnimations();
   }
+
+  // Sicherstellen, dass spaet geladene Elemente init haben
+  window.addEventListener('load', () => {
+    if (typeof gsap === 'undefined') return;
+    initWaage();
+    initRevealScatter();
+  }, { once: true });
 })();
