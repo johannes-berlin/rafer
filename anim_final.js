@@ -752,6 +752,7 @@
   let scatterInstances = [];
 
   function initScatterLoader() {
+    if (!document.body || !document.body.hasAttribute('data-home')) return;
     if (typeof gsap === 'undefined') return;
 
     gsap.set('.nav', { autoAlpha: 0, y: -100 });
