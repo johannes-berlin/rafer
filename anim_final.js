@@ -875,6 +875,27 @@
       const vh = window.innerHeight;
       let maxEnd = 0;
 
+      const patternPaths = document.querySelectorAll('.sticky_pattern path');
+      if (patternPaths.length) {
+        patternPaths.forEach((p) => {
+          if (typeof p.getTotalLength !== 'function') return;
+          const len = p.getTotalLength();
+          gsap.set(p, {
+            strokeDasharray: len,
+            strokeDashoffset: len,
+            stroke: 'currentColor',
+            fill: 'none'
+          });
+        });
+        gsap.set('.sticky_pattern', { autoAlpha: 1 });
+        gsap.to(patternPaths, {
+          strokeDashoffset: 0,
+          duration: 1.6,
+          ease: 'power3.out',
+          stagger: 0.06
+        });
+      }
+
       letters.forEach(el => {
         const toX = gsap.getProperty(el, 'x');
         const toY = gsap.getProperty(el, 'y');
