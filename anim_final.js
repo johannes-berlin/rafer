@@ -1052,9 +1052,9 @@
     };
 
     const LOCALES = [
-      { code: 'en', href: '/', flag: '<img src="https://cdn.prod.website-files.com/68cf1bdb43064e3f6ad251ae/69b3a01b764abc62544abc76_en%201.svg" alt="EN">', label: 'EN', fullName: 'English' },
-      { code: 'de', href: '/de', flag: '<img src="https://cdn.prod.website-files.com/68cf1bdb43064e3f6ad251ae/69b3a01b2a62d2d8b5a1d300_de%201.svg" alt="DE">', label: 'DE', fullName: 'Deutsch' },
-      { code: 'pt', href: '/pt', flag: '<img src="https://cdn.prod.website-files.com/68cf1bdb43064e3f6ad251ae/69b3a01a11059c81ef26ebf0_pt%201.svg" alt="PT">', label: 'PT', fullName: 'Portugues' }
+      { code: 'en', href: '/', label: 'EN', fullName: 'English' },
+      { code: 'de', href: '/de', label: 'DE', fullName: 'Deutsch' },
+      { code: 'pt', href: '/pt', label: 'PT', fullName: 'Portugues' }
     ];
 
     function detectCurrentLocale() {
@@ -1086,12 +1086,33 @@
       const currentLabel = document.querySelector('.current-label');
       if (!switcher || !trigger || !dropdown || !currentFlag || !currentLabel) return;
 
+      const inlineFlags = {};
+      const inlineFlagNodes = document.querySelectorAll('[data-locale-flag]');
+      inlineFlagNodes.forEach(node => {
+        const code = (node.getAttribute('data-locale-flag') || '').toLowerCase();
+        if (!code) return;
+        let markup = '';
+        const tag = node.tagName.toLowerCase();
+        if (tag === 'template') {
+          markup = node.innerHTML.trim();
+        } else if (tag === 'svg') {
+          markup = node.outerHTML;
+        } else {
+          markup = node.innerHTML.trim() || node.outerHTML;
+        }
+        if (markup) inlineFlags[code] = markup;
+      });
+
       let activeCode = detectCurrentLocale();
+
+      function getFlagMarkup(code) {
+        return inlineFlags[code] || FLAGS[code] || '';
+      }
 
       function renderTrigger(code) {
         const locale = LOCALES.find(l => l.code === code);
         if (!locale) return;
-        currentFlag.innerHTML = locale.flag;
+        currentFlag.innerHTML = getFlagMarkup(locale.code);
         currentLabel.textContent = locale.code.toUpperCase();
       }
 
@@ -1101,7 +1122,7 @@
           if (locale.code === activeCode) return;
           const btn = document.createElement('button');
           btn.dataset.code = locale.code;
-          btn.innerHTML = '<span class="flag">' + locale.flag + '</span>' +
+          btn.innerHTML = '<span class="flag">' + getFlagMarkup(locale.code) + '</span>' +
             '<span class="label">' + locale.code.toUpperCase() + '</span>';
           btn.addEventListener('click', () => {
             activeCode = locale.code;
