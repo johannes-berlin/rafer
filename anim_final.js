@@ -920,12 +920,13 @@
         maxEnd = Math.max(maxEnd, delay + dur);
       });
 
-      gsap.delayedCall(maxEnd, () => {
-        gsap.set('.sticky_pattern', { autoAlpha: 1 });
-      gsap.set('.sticky-indicator', { autoAlpha: 1 });
-        gsap.to('.nav', { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.out' });
-        createScrollAnimation();
-      });
+    gsap.delayedCall(maxEnd, () => {
+      gsap.set('.sticky_pattern', { autoAlpha: 1 });
+      gsap.set('.sticky-indicator', { autoAlpha: 0, y: 20 });
+      gsap.to('.nav', { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.out' });
+      gsap.to('.sticky-indicator', { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '<');
+      createScrollAnimation();
+    });
     }
 
     function createScrollAnimation() {
