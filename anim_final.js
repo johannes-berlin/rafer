@@ -1052,9 +1052,9 @@
     };
 
     const LOCALES = [
-      { code: 'en', href: '/', flag: FLAGS.en, label: 'EN', fullName: 'English' },
-      { code: 'de', href: '/de', flag: FLAGS.de, label: 'DE', fullName: 'Deutsch' },
-      { code: 'pt', href: '/pt', flag: FLAGS.pt, label: 'PT', fullName: 'Portugues' }
+      { code: 'en', href: '/', flag: '<img src="https://cdn.prod.website-files.com/68cf1bdb43064e3f6ad251ae/69b3a01b764abc62544abc76_en%201.svg" alt="EN">', label: 'EN', fullName: 'English' },
+      { code: 'de', href: '/de', flag: '<img src="https://cdn.prod.website-files.com/68cf1bdb43064e3f6ad251ae/69b3a01b2a62d2d8b5a1d300_de%201.svg" alt="DE">', label: 'DE', fullName: 'Deutsch' },
+      { code: 'pt', href: '/pt', flag: '<img src="https://cdn.prod.website-files.com/68cf1bdb43064e3f6ad251ae/69b3a01a11059c81ef26ebf0_pt%201.svg" alt="PT">', label: 'PT', fullName: 'Portugues' }
     ];
 
     function detectCurrentLocale() {
