@@ -1056,88 +1056,72 @@
       { code: 'pt', href: '/pt', flag: FLAGS.pt, label: 'PT', fullName: 'Portugues' }
     ];
 
-    function getCurrentLocale() {
+    function detectCurrentLocale() {
       const path = window.location.pathname;
       const htmlLang = document.documentElement.lang;
       for (let i = 0; i < LOCALES.length; i++) {
         const locPath = new URL(LOCALES[i].href, window.location.origin).pathname;
-        if (path === locPath || path.startsWith(locPath + '/')) return LOCALES[i];
+        if (path === locPath || path.startsWith(locPath + '/')) return LOCALES[i].code;
       }
       if (htmlLang) {
         const code = htmlLang.split('-')[0].toLowerCase();
         const match = LOCALES.find(l => l.code === code);
-        if (match) return match;
+        if (match) return match.code;
       }
-      return LOCALES[0];
+      return LOCALES[0].code;
     }
 
-    function scatterText(text) {
-      return text.split('').map(function (c, i) {
-        const tx = (Math.random() - 0.5) * 8;
-        const ty = (Math.random() - 0.5) * 6;
-        const tr = (Math.random() - 0.5) * 12;
-        return '<span class="text-char" style="--tx:' + tx + 'px;--ty:' + ty + 'px;--tr:' + tr + 'deg;animation-delay:' + (i * 0.03) + 's">' + (c === ' ' ? '&nbsp;' : c) + '</span>';
-      }).join('');
+    function switchLocale(code) {
+      const locale = LOCALES.find(l => l.code === code);
+      if (locale) window.location.href = locale.href;
     }
 
     function init() {
-      const current = getCurrentLocale();
-      document.querySelectorAll('.locale-switcher').forEach(function (switcher) {
-        const dropdown = switcher.querySelector('.locale-dropdown');
-        const trigger = switcher.querySelector('.locale-trigger');
-        if (!dropdown || !trigger) return;
+      const switcher = document.querySelector('.locale-switcher');
+      const trigger = document.querySelector('.locale-trigger');
+      const dropdown = document.querySelector('.locale-dropdown');
+      const currentFlag = document.querySelector('.current-flag');
+      const currentLabel = document.querySelector('.current-label');
+      if (!switcher || !trigger || !dropdown || !currentFlag || !currentLabel) return;
 
-        trigger.querySelector('.current-flag').innerHTML = current.flag;
-        trigger.querySelector('.current-label').textContent = current.label;
+      let activeCode = detectCurrentLocale();
 
+      function renderTrigger(code) {
+        const locale = LOCALES.find(l => l.code === code);
+        if (!locale) return;
+        currentFlag.innerHTML = locale.flag;
+        currentLabel.textContent = locale.code.toUpperCase();
+      }
+
+      function renderDropdown() {
         dropdown.innerHTML = '';
-        LOCALES.forEach(function (loc) {
-          if (loc.code === current.code) return;
+        LOCALES.forEach(locale => {
+          if (locale.code === activeCode) return;
           const btn = document.createElement('button');
-          btn.className = 'locale-option';
-          btn.setAttribute('role', 'option');
-          btn.innerHTML = '<span class="flag">' + loc.flag + '</span>' +
-            '<span class="name">' + scatterText(loc.fullName) + '</span>';
-
-          btn.addEventListener('click', function () {
-            window.location.href = loc.href;
+          btn.dataset.code = locale.code;
+          btn.innerHTML = '<span class="flag">' + locale.flag + '</span>' +
+            '<span class="label">' + locale.code.toUpperCase() + '</span>';
+          btn.addEventListener('click', () => {
+            activeCode = locale.code;
+            renderTrigger(activeCode);
+            renderDropdown();
+            close();
+            switchLocale(locale.code);
           });
           dropdown.appendChild(btn);
         });
+      }
 
-        trigger.addEventListener('click', function (e) {
-          e.stopPropagation();
-          const isOpen = switcher.classList.contains('open');
-          document.querySelectorAll('.locale-switcher.open').forEach(function (s) {
-            s.classList.remove('open');
-            s.querySelector('.locale-trigger').setAttribute('aria-expanded', 'false');
-          });
-          if (!isOpen) {
-            switcher.classList.add('open');
-            trigger.setAttribute('aria-expanded', 'true');
-          }
-        });
-      });
+      function open() { switcher.classList.add('locale-switcher--open'); }
+      function close() { switcher.classList.remove('locale-switcher--open'); }
+      function toggle() { switcher.classList.contains('locale-switcher--open') ? close() : open(); }
 
-      document.addEventListener('click', function () {
-        document.querySelectorAll('.locale-switcher.open').forEach(function (s) {
-          s.classList.remove('open');
-          s.querySelector('.locale-trigger').setAttribute('aria-expanded', 'false');
-        });
-      });
+      trigger.addEventListener('click', e => { e.stopPropagation(); toggle(); });
+      document.addEventListener('click', e => { if (!switcher.contains(e.target)) close(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-          document.querySelectorAll('.locale-switcher.open').forEach(function (s) {
-            s.classList.remove('open');
-            s.querySelector('.locale-trigger').setAttribute('aria-expanded', 'false');
-          });
-        }
-      });
-
-      document.querySelectorAll('.locale-dropdown').forEach(function (dd) {
-        dd.addEventListener('click', function (e) { e.stopPropagation(); });
-      });
+      renderTrigger(activeCode);
+      renderDropdown();
     }
 
     if (document.readyState === 'loading') {
