@@ -1039,6 +1039,7 @@
   }
 
   // Locale switcher
+  let __localeSwitcherInitialized = false;
   function initLocaleSwitcher() {
     function sketchFlag(paths) {
       return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 24" width="28" height="20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="display:block">' + paths + '</svg>';
@@ -1077,6 +1078,7 @@
     }
 
     function init() {
+      if (__localeSwitcherInitialized) return;
       const switcher = document.querySelector('.locale-switcher');
       const trigger = document.querySelector('.locale-trigger');
       const dropdown = document.querySelector('.locale-dropdown');
@@ -1128,6 +1130,7 @@
 
       renderTrigger(activeCode);
       renderDropdown();
+      __localeSwitcherInitialized = true;
     }
 
     if (document.readyState === 'loading') {
@@ -1380,6 +1383,7 @@
   let __animFinalInitialized = false;
 
   function initAllAnimations() {
+    initLocaleSwitcher();
     if (typeof gsap === 'undefined') {
       window.addEventListener('load', initAllAnimations, { once: true });
       return;
