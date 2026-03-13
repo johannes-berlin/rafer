@@ -715,7 +715,7 @@
 
     const testimonialItems = gsap.utils.toArray('.testimonial_cms_item');
     testimonialItems.forEach((item) => {
-      const imgs = item.querySelectorAll('.team_card_visual img, .team_card_texture');
+      const imgs = item.querySelectorAll('.team_card_visual img');
 
       if (imgs.length) {
         gsap.set(imgs, { clipPath: 'circle(0% at 50% 50%)' });
