@@ -922,6 +922,7 @@
 
       gsap.delayedCall(maxEnd, () => {
         gsap.set('.sticky_pattern', { autoAlpha: 1 });
+      gsap.set('.sticky-indicator', { autoAlpha: 1 });
         gsap.to('.nav', { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.out' });
         createScrollAnimation();
       });
@@ -961,6 +962,12 @@
         { autoAlpha: 1, y: 0, duration: 0.1, ease: 'power2.out' },
         0.8
       );
+
+    tl.to(
+      '.sticky-indicator',
+      { autoAlpha: 0, duration: 0.2, ease: 'power2.out' },
+      0.05
+    );
 
       tl.to({}, { duration: 1 }, 1);
     }
