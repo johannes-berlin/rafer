@@ -1368,6 +1368,10 @@
   // 05) INITIALISIERUNG
   // =========================================================
   function initAllAnimations() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+      window.addEventListener('load', initAllAnimations, { once: true });
+      return;
+    }
     initLenis();
     initContentRevealScroll();
     initArrowPathAnimation();
