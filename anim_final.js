@@ -956,18 +956,6 @@
     return { rebuild };
   }
 
-  // Reveal clip rect (simple)
-  function initRevealClip() {
-    if (typeof gsap === 'undefined') return;
-    const rect = document.querySelector('#reveal-clip rect');
-    if (!rect) return;
-    gsap.set(rect, { attr: { height: 0 } });
-    gsap.to(rect, {
-      attr: { height: 571 },
-      duration: 2,
-      ease: 'power2.inOut'
-    });
-  }
 
   // Waage animation
   function initWaage() {
@@ -1390,7 +1378,6 @@
     initPartnersTitle();
     initTestimonials();
     initScatterLoader();
-    initRevealClip();
     initWaage();
     initLocaleSwitcher();
     initRevealScatter();
@@ -1408,6 +1395,5 @@
     if (typeof gsap === 'undefined') return;
     initWaage();
     initRevealScatter();
-    initRevealClip();
   }, { once: true });
 })();
