@@ -1112,8 +1112,14 @@
         });
       }
 
-      function open() { switcher.classList.add('open'); }
-      function close() { switcher.classList.remove('open'); }
+      function open() {
+        switcher.classList.add('open', 'locale-switcher--open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+      function close() {
+        switcher.classList.remove('open', 'locale-switcher--open');
+        trigger.setAttribute('aria-expanded', 'false');
+      }
       function toggle() { switcher.classList.contains('open') ? close() : open(); }
 
       trigger.addEventListener('click', e => { e.stopPropagation(); toggle(); });
