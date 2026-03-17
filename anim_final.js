@@ -826,8 +826,8 @@
 
       const maxW = Math.min(55 * rem, vw);
       const boundsLeft = (vw - maxW) / 2;
-      const boundsTop = vh * 0.25;
       const boundsH = vh * 0.6;
+      const boundsTop = (vh - boundsH) / 2; // vertikal zentriert im Viewport
 
       const typo = getComputedStyle(headline);
 
