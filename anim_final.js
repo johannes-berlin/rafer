@@ -48,8 +48,9 @@
     // autoRaf: false – Lenis wird vom GSAP-Ticker angesteuert (saubere Sync mit ScrollTrigger, weniger Ruckler auf iOS)
     __lenisInstance = new Lenis({
       autoRaf: false,
-      duration: 1.15,
-      smoothTouch: false,
+      duration: 1.35,
+      lerp: 0.08,
+      smoothTouch: true,
       touchMultiplier: 1.5
     });
 
