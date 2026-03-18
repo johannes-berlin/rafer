@@ -843,8 +843,18 @@
       const targets = measureLayout();
       const vw = sticky.offsetWidth;
       const vh = sticky.offsetHeight;
-      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
 
+      // Textblock horizontal in der scatter-stage zentrieren (unabhängig von DOM text-align)
+      const nonSpace = targets.filter(t => !t.space);
+      if (nonSpace.length) {
+        const minCx = Math.min(...nonSpace.map(t => t.cx));
+        const maxCx = Math.max(...nonSpace.map(t => t.cx));
+        const centerX = (minCx + maxCx) / 2;
+        const offsetX = vw / 2 - centerX;
+        targets.forEach(t => { t.cx += offsetX; });
+      }
+
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
       const maxW = Math.min(55 * rem, vw);
       const boundsLeft = (vw - maxW) / 2;
       const boundsH = vh * 0.6;
