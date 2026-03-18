@@ -958,7 +958,14 @@ function createScatter(headline) {
       gsap.set('.sticky_pattern', { autoAlpha: 1 });
       gsap.set('.sticky-indicator', { autoAlpha: 0, y: 20 });
       gsap.to('.nav', { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.out' });
-      gsap.to('.sticky-indicator', { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '<');
+      const scrollTop = (typeof __lenisInstance !== 'undefined' && __lenisInstance && typeof __lenisInstance.scroll === 'number')
+        ? __lenisInstance.scroll
+        : (window.scrollY ?? document.documentElement.scrollTop ?? 0);
+      if (scrollTop <= 80) {
+        gsap.to('.sticky-indicator', { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '<');
+      } else {
+        gsap.set('.sticky-indicator', { autoAlpha: 0 });
+      }
       createScrollAnimation();
     });
   }
@@ -1011,6 +1018,11 @@ function createScatter(headline) {
       onEnterBack: () => gsap.to('.sticky-indicator', { autoAlpha: 1, y: 0, duration: 0.3, ease: 'power2.out' }),
       onLeave: () => gsap.to('.sticky-indicator', { autoAlpha: 0, duration: 0.2, ease: 'power2.out' }),
     });
+    // Nach Reload mit gescrollter Position: Indicator sofort ausblenden, wenn nicht am Top
+    const scrollTop = (typeof __lenisInstance !== 'undefined' && __lenisInstance && typeof __lenisInstance.scroll === 'number')
+      ? __lenisInstance.scroll
+      : (window.scrollY ?? document.documentElement.scrollTop ?? 0);
+    if (scrollTop > 80) gsap.set('.sticky-indicator', { autoAlpha: 0 });
   }
 
   function rebuild() {
