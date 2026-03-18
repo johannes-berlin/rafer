@@ -45,9 +45,17 @@
     }
     if (__lenisInstance) return;
 
-    // Lenis (with GSAP Scrolltrigger) – laut Doku
-    __lenisInstance = new Lenis();
-    if (typeof ScrollTrigger !== 'undefined') __lenisInstance.on('scroll', ScrollTrigger.update);
+    __lenisInstance = new Lenis({
+      lerp: 0.1,
+      smoothTouch: false,   // kein smooth auf touch devices (iOS fix)
+      syncTouch: true,      // nativem iOS-Momentum folgen statt intercepten
+      syncTouchLerp: 0.075,
+    });
+
+    if (typeof ScrollTrigger !== 'undefined') {
+      __lenisInstance.on('scroll', ScrollTrigger.update);
+    }
+
     if (typeof gsap !== 'undefined') {
       gsap.ticker.add((time) => { __lenisInstance.raf(time * 1000); });
       gsap.ticker.lagSmoothing(0);
