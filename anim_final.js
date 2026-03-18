@@ -770,186 +770,188 @@
   }
 
   // Scatter loader for hero headline
-  let scatterInstances = [];
+let scatterInstances = [];
 
-  function initScatterLoader() {
-    if (!document.body || !document.body.hasAttribute('data-home')) return;
-    if (typeof gsap === 'undefined') return;
+function initScatterLoader() {
+  if (!document.body || !document.body.hasAttribute('data-home')) return;
+  if (typeof gsap === 'undefined') return;
 
-    gsap.set('.nav', { autoAlpha: 0, y: -100 });
-    gsap.set('.sticky_cta', { autoAlpha: 0, y: 20 });
+  gsap.set('.nav', { autoAlpha: 0, y: -100 });
+  gsap.set('.sticky_cta', { autoAlpha: 0, y: 20 });
 
-    window.addEventListener('load', () => {
-      window.scrollTo(0, 0);
-      if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(() => {
-          document.querySelectorAll('[data-scatter]').forEach(el => {
-            const instance = createScatter(el);
-            scatterInstances.push(instance);
-          });
-        });
-      } else {
+  window.addEventListener('load', () => {
+    window.scrollTo(0, 0);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
         document.querySelectorAll('[data-scatter]').forEach(el => {
           const instance = createScatter(el);
           scatterInstances.push(instance);
         });
-      }
-    });
+      });
+    } else {
+      document.querySelectorAll('[data-scatter]').forEach(el => {
+        const instance = createScatter(el);
+        scatterInstances.push(instance);
+      });
+    }
+  });
 
-    window.addEventListener(
-      'resize',
-      gsap.utils.debounce(() => {
-        scatterInstances.forEach(i => i.rebuild());
-      }, 300)
-    );
+  window.addEventListener(
+    'resize',
+    gsap.utils.debounce(() => {
+      scatterInstances.forEach(i => i.rebuild());
+    }, 300)
+  );
+}
+
+function createScatter(headline) {
+  const sticky = headline.closest('.hero-sticky');
+  if (!sticky) return { rebuild() {} };
+  const stage = sticky.querySelector('.scatter-stage');
+  if (!stage) return { rebuild() {} };
+  let letters = [];
+
+  function measureLayout() {
+    const stageRect = stage.getBoundingClientRect();
+    const walker = document.createTreeWalker(headline, NodeFilter.SHOW_TEXT);
+    const range = document.createRange();
+    const targets = [];
+    let node;
+
+    while ((node = walker.nextNode())) {
+      const text = node.textContent;
+      for (let i = 0; i < text.length; i++) {
+        range.setStart(node, i);
+        range.setEnd(node, i + 1);
+        const rect = range.getBoundingClientRect();
+        if (rect.width < 0.5) continue;
+        const char = text[i];
+        targets.push({
+          char,
+          space: /\s/.test(char),
+          cx: rect.left - stageRect.left + rect.width / 2,
+          cy: rect.top - stageRect.top + rect.height / 2,
+        });
+      }
+    }
+    return targets;
   }
 
-  function createScatter(headline) {
-    const sticky = headline.closest('.hero-sticky');
-    if (!sticky) return { rebuild() {} };
-    const stage = sticky.querySelector('.scatter-stage');
-    if (!stage) return { rebuild() {} };
-    let letters = [];
+  function build() {
+    const targets = measureLayout();
+    headline.style.visibility = 'hidden';
 
-    function measureLayout() {
-      const stageRect = stage.getBoundingClientRect();
-      const walker = document.createTreeWalker(headline, NodeFilter.SHOW_TEXT);
-      const range = document.createRange();
-      const targets = [];
-      let node;
+    const stageW = stage.offsetWidth;
+    const vw = sticky.offsetWidth;
+    const vh = sticky.offsetHeight;
 
-      while ((node = walker.nextNode())) {
-        const text = node.textContent;
-        for (let i = 0; i < text.length; i++) {
-          range.setStart(node, i);
-          range.setEnd(node, i + 1);
-          const rect = range.getBoundingClientRect();
-          if (rect.width < 0.5) continue;
-          const char = text[i];
-          targets.push({
-            char,
-            space: /\s/.test(char),
-            cx: rect.left - stageRect.left + rect.width / 2,
-            cy: rect.top - stageRect.top + rect.height / 2,
-          });
-        }
-      }
-      return targets;
+    // FIX: Bounding-Box-Mitte statt Durchschnitt verwenden
+    const nonSpace = targets.filter(t => !t.space);
+    if (nonSpace.length) {
+      const minX = Math.min(...nonSpace.map(t => t.cx));
+      const maxX = Math.max(...nonSpace.map(t => t.cx));
+      const textCenter = minX + (maxX - minX) / 2;
+      const offsetX = stageW / 2 - textCenter;
+      targets.forEach(t => { t.cx += offsetX; });
     }
 
-    function build() {
-      const targets = measureLayout();
-      headline.style.visibility = 'hidden';
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const maxW = Math.min(55 * rem, vw);
+    const boundsLeft = (vw - maxW) / 2;
+    const boundsH = vh * 0.6;
+    const boundsTop = (vh - boundsH) / 2;
 
-      const stageW = stage.offsetWidth;
-      const vw = sticky.offsetWidth;
-      const vh = sticky.offsetHeight;
+    const typo = getComputedStyle(headline);
 
-      // Textblock horizontal in der scatter-stage zentrieren (Stage-Mitte = stageW/2)
-      const nonSpace = targets.filter(t => !t.space);
-      if (nonSpace.length) {
-        const centerX = nonSpace.reduce((s, t) => s + t.cx, 0) / nonSpace.length;
-        const offsetX = stageW / 2 - centerX;
-        targets.forEach(t => { t.cx += offsetX; });
-      }
+    targets
+      .filter(t => !t.space)
+      .forEach(t => {
+        const randX = boundsLeft + Math.random() * maxW;
+        const randY = boundsTop + Math.random() * boundsH;
 
-      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      const maxW = Math.min(55 * rem, vw);
-      const boundsLeft = (vw - maxW) / 2;
-      const boundsH = vh * 0.6;
-      const boundsTop = (vh - boundsH) / 2; // vertikal zentriert im Viewport
+        const span = document.createElement('span');
+        span.className = 'scatter-letter';
+        span.textContent = t.char;
 
-      const typo = getComputedStyle(headline);
+        span.dataset.cx = t.cx;
+        span.dataset.cy = t.cy;
 
-      targets
-        .filter(t => !t.space)
-        .forEach(t => {
-          const randX = boundsLeft + Math.random() * maxW;
-          const randY = boundsTop + Math.random() * boundsH;
+        span.style.font = typo.font;
+        span.style.color = typo.color;
+        span.style.letterSpacing = typo.letterSpacing;
+        span.style.textTransform = typo.textTransform;
+        span.style.lineHeight = '1';
 
-          const span = document.createElement('span');
-          span.className = 'scatter-letter';
-          span.textContent = t.char;
-
-          span.dataset.cx = t.cx;
-          span.dataset.cy = t.cy;
-
-          span.style.font = typo.font;
-          span.style.color = typo.color;
-          span.style.letterSpacing = typo.letterSpacing;
-          span.style.textTransform = typo.textTransform;
-          span.style.lineHeight = '1';
-
-          gsap.set(span, {
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            xPercent: -50,
-            yPercent: -50,
-            x: randX,
-            y: randY,
-            rotation: (Math.random() - 0.5) * 300,
-            scale: 0.5 + Math.random() * 0.6,
-            autoAlpha: 0,
-            force3D: true,
-          });
-
-          stage.appendChild(span);
-          letters.push(span);
+        gsap.set(span, {
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          xPercent: -50,
+          yPercent: -50,
+          x: randX,
+          y: randY,
+          rotation: (Math.random() - 0.5) * 300,
+          scale: 0.5 + Math.random() * 0.6,
+          autoAlpha: 0,
+          force3D: true,
         });
 
-      runLoader();
-    }
-
-    function runLoader() {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      let maxEnd = 0;
-
-      const patternPaths = document.querySelectorAll('.sticky_pattern path');
-      if (patternPaths.length) {
-        patternPaths.forEach((p) => {
-          if (typeof p.getTotalLength !== 'function') return;
-          const len = p.getTotalLength();
-          gsap.set(p, {
-            strokeDasharray: len,
-            strokeDashoffset: len,
-            stroke: 'currentColor',
-            fill: 'none'
-          });
-        });
-        gsap.set('.sticky_pattern', { autoAlpha: 1 });
-        gsap.to(patternPaths, {
-          strokeDashoffset: 0,
-          duration: 1.6,
-          ease: 'power3.out',
-          stagger: 0.06
-        });
-      }
-
-      letters.forEach(el => {
-        const toX = gsap.getProperty(el, 'x');
-        const toY = gsap.getProperty(el, 'y');
-        const toR = gsap.getProperty(el, 'rotation');
-        const toS = gsap.getProperty(el, 'scale');
-
-        const angle = Math.random() * Math.PI * 2;
-        const dist = Math.max(vw, vh) * 1.3;
-        const fromX = Math.cos(angle) * dist;
-        const fromY = Math.sin(angle) * dist;
-        const fromR = (Math.random() - 0.5) * 720;
-        const fromS = 0.2 + Math.random() * 0.4;
-        const delay = Math.random() * 0.5;
-        const dur = 0.7 + Math.random() * 0.5;
-
-        gsap.fromTo(
-          el,
-          { autoAlpha: 0, x: fromX, y: fromY, rotation: fromR, scale: fromS },
-          { autoAlpha: 1, x: toX, y: toY, rotation: toR, scale: toS, duration: dur, ease: 'power3.out', delay, force3D: true }
-        );
-
-        maxEnd = Math.max(maxEnd, delay + dur);
+        stage.appendChild(span);
+        letters.push(span);
       });
+
+    runLoader();
+  }
+
+  function runLoader() {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    let maxEnd = 0;
+
+    const patternPaths = document.querySelectorAll('.sticky_pattern path');
+    if (patternPaths.length) {
+      patternPaths.forEach((p) => {
+        if (typeof p.getTotalLength !== 'function') return;
+        const len = p.getTotalLength();
+        gsap.set(p, {
+          strokeDasharray: len,
+          strokeDashoffset: len,
+          stroke: 'currentColor',
+          fill: 'none'
+        });
+      });
+      gsap.set('.sticky_pattern', { autoAlpha: 1 });
+      gsap.to(patternPaths, {
+        strokeDashoffset: 0,
+        duration: 1.6,
+        ease: 'power3.out',
+        stagger: 0.06
+      });
+    }
+
+    letters.forEach(el => {
+      const toX = gsap.getProperty(el, 'x');
+      const toY = gsap.getProperty(el, 'y');
+      const toR = gsap.getProperty(el, 'rotation');
+      const toS = gsap.getProperty(el, 'scale');
+
+      const angle = Math.random() * Math.PI * 2;
+      const dist = Math.max(vw, vh) * 1.3;
+      const fromX = Math.cos(angle) * dist;
+      const fromY = Math.sin(angle) * dist;
+      const fromR = (Math.random() - 0.5) * 720;
+      const fromS = 0.2 + Math.random() * 0.4;
+      const delay = Math.random() * 0.5;
+      const dur = 0.7 + Math.random() * 0.5;
+
+      gsap.fromTo(
+        el,
+        { autoAlpha: 0, x: fromX, y: fromY, rotation: fromR, scale: fromS },
+        { autoAlpha: 1, x: toX, y: toY, rotation: toR, scale: toS, duration: dur, ease: 'power3.out', delay, force3D: true }
+      );
+
+      maxEnd = Math.max(maxEnd, delay + dur);
+    });
 
     gsap.delayedCall(maxEnd, () => {
       gsap.set('.sticky_pattern', { autoAlpha: 1 });
@@ -958,42 +960,42 @@
       gsap.to('.sticky-indicator', { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '<');
       createScrollAnimation();
     });
-    }
+  }
 
-    function createScrollAnimation() {
-      const scrollEl =
-        headline.closest('[data-scatter-scroll]') || headline.closest('.hero-scroll');
+  function createScrollAnimation() {
+    const scrollEl =
+      headline.closest('[data-scatter-scroll]') || headline.closest('.hero-scroll');
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: scrollEl,
-          start: 'top top',
-          end: '+=300%',
-          scrub: 1.2,
-        },
-      });
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: scrollEl,
+        start: 'top top',
+        end: '+=300%',
+        scrub: 1.2,
+      },
+    });
 
-      letters.forEach((el, i) => {
-        tl.to(
-          el,
-          {
-            x: parseFloat(el.dataset.cx),
-            y: parseFloat(el.dataset.cy),
-            rotation: 0,
-            scale: 1,
-            ease: 'power3.out',
-            duration: 0.55,
-            force3D: true,
-          },
-          (i / letters.length) * 0.55
-        );
-      });
-
+    letters.forEach((el, i) => {
       tl.to(
-        '.sticky_cta',
-        { autoAlpha: 1, y: 0, duration: 0.1, ease: 'power2.out' },
-        0.8
+        el,
+        {
+          x: parseFloat(el.dataset.cx),
+          y: parseFloat(el.dataset.cy),
+          rotation: 0,
+          scale: 1,
+          ease: 'power3.out',
+          duration: 0.55,
+          force3D: true,
+        },
+        (i / letters.length) * 0.55
       );
+    });
+
+    tl.to(
+      '.sticky_cta',
+      { autoAlpha: 1, y: 0, duration: 0.1, ease: 'power2.out' },
+      0.8
+    );
 
     tl.to(
       '.sticky-indicator',
@@ -1001,20 +1003,20 @@
       0.05
     );
 
-      tl.to({}, { duration: 1 }, 1);
-    }
-
-    function rebuild() {
-      ScrollTrigger.getAll().forEach(st => st.kill());
-      stage.innerHTML = '';
-      letters = [];
-      headline.style.visibility = ''; // sichtbar für measureLayout() in build()
-      build();
-    }
-
-    build();
-    return { rebuild };
+    tl.to({}, { duration: 1 }, 1);
   }
+
+  function rebuild() {
+    ScrollTrigger.getAll().forEach(st => st.kill());
+    stage.innerHTML = '';
+    letters = [];
+    headline.style.visibility = '';
+    build();
+  }
+
+  build();
+  return { rebuild };
+}
 
 
   // Waage animation
