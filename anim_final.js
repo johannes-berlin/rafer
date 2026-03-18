@@ -35,8 +35,6 @@
   // =========================================================
   let __lenisInstance = null;
   let __lenisRafId = null;
-  let __lenisGsapTicker = null;
-  let __lenisAnchorBound = false;
 
   function initLenis() {
     if (typeof Lenis === 'undefined') {
@@ -47,38 +45,36 @@
 
     __lenisInstance = new Lenis({
       lerp: 0.1,
-      smoothTouch: false,   // kein smooth auf touch devices (iOS fix)
-      syncTouch: true,      // nativem iOS-Momentum folgen statt intercepten
-      syncTouchLerp: 0.075,
+      wheelMultiplier: 0.7,
+      gestureOrientation: 'vertical',
+      normalizeWheel: false,
+      smoothTouch: false,
     });
 
-    if (typeof ScrollTrigger !== 'undefined') {
+    if (typeof ScrollTrigger !== 'undefined' && __lenisInstance.on) {
       __lenisInstance.on('scroll', ScrollTrigger.update);
     }
 
-    if (typeof gsap !== 'undefined') {
-      gsap.ticker.add((time) => { __lenisInstance.raf(time * 1000); });
-      gsap.ticker.lagSmoothing(0);
+    function raf(time) {
+      __lenisInstance.raf(time);
+      __lenisRafId = requestAnimationFrame(raf);
     }
+    __lenisRafId = requestAnimationFrame(raf);
 
     const jq = window.jQuery || window.$;
     if (jq && typeof jq === 'function') {
       jq('[data-lenis-start]').on('click', function () {
         __lenisInstance.start();
-        if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
       });
       jq('[data-lenis-stop]').on('click', function () {
         __lenisInstance.stop();
-        if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
       });
       jq('[data-lenis-toggle]').on('click', function () {
         jq(this).toggleClass('stop-scroll');
         if (jq(this).hasClass('stop-scroll')) {
           __lenisInstance.stop();
-          if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
         } else {
           __lenisInstance.start();
-          if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
         }
       });
     }
