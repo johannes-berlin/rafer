@@ -805,8 +805,6 @@
   }
 
   function createScatter(headline) {
-    headline.style.visibility = 'hidden';
-
     const sticky = headline.closest('.hero-sticky');
     if (!sticky) return { rebuild() {} };
     const stage = sticky.querySelector('.scatter-stage');
@@ -814,7 +812,7 @@
     let letters = [];
 
     function measureLayout() {
-      const stickyRect = sticky.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
       const walker = document.createTreeWalker(headline, NodeFilter.SHOW_TEXT);
       const range = document.createRange();
       const targets = [];
@@ -831,8 +829,8 @@
           targets.push({
             char,
             space: /\s/.test(char),
-            cx: Math.round(rect.left - stickyRect.left + rect.width / 2),
-            cy: Math.round(rect.top - stickyRect.top + rect.height / 2),
+            cx: rect.left - stageRect.left + rect.width / 2,
+            cy: rect.top - stageRect.top + rect.height / 2,
           });
         }
       }
@@ -841,16 +839,19 @@
 
     function build() {
       const targets = measureLayout();
+      headline.style.visibility = 'hidden';
+
+      const stageW = stage.getBoundingClientRect().width;
       const vw = sticky.offsetWidth;
       const vh = sticky.offsetHeight;
 
-      // Textblock horizontal in der scatter-stage zentrieren (unabhängig von DOM text-align)
+      // Textblock horizontal in der scatter-stage zentrieren (Stage-Koordinaten)
       const nonSpace = targets.filter(t => !t.space);
       if (nonSpace.length) {
         const minCx = Math.min(...nonSpace.map(t => t.cx));
         const maxCx = Math.max(...nonSpace.map(t => t.cx));
         const centerX = (minCx + maxCx) / 2;
-        const offsetX = vw / 2 - centerX;
+        const offsetX = stageW / 2 - centerX;
         targets.forEach(t => { t.cx += offsetX; });
       }
 
