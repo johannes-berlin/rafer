@@ -769,7 +769,7 @@
     });
   }
 
-  // Scatter loader for hero headline
+ // Scatter loader for hero headline
 let scatterInstances = [];
 
 function initScatterLoader() {
@@ -841,25 +841,26 @@ function createScatter(headline) {
     const targets = measureLayout();
     headline.style.visibility = 'hidden';
 
-    const stageW = stage.offsetWidth;
-    const vw = sticky.offsetWidth;
-    const vh = sticky.offsetHeight;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const stageRect = stage.getBoundingClientRect();
 
-    // FIX: Bounding-Box-Mitte statt Durchschnitt verwenden
+    // Zentrierung viewport-relativ berechnen
     const nonSpace = targets.filter(t => !t.space);
     if (nonSpace.length) {
-      const minX = Math.min(...nonSpace.map(t => t.cx));
-      const maxX = Math.max(...nonSpace.map(t => t.cx));
-      const textCenter = minX + (maxX - minX) / 2;
-      const offsetX = stageW / 2 - textCenter;
+      const vxValues = nonSpace.map(t => t.cx + stageRect.left);
+      const minVX = Math.min(...vxValues);
+      const maxVX = Math.max(...vxValues);
+      const textCenterVX = minVX + (maxVX - minVX) / 2;
+      const offsetX = vw / 2 - textCenterVX;
       targets.forEach(t => { t.cx += offsetX; });
     }
 
     const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
     const maxW = Math.min(55 * rem, vw);
-    const boundsLeft = (vw - maxW) / 2;
+    const boundsLeft = (vw - maxW) / 2 - stageRect.left;
     const boundsH = vh * 0.6;
-    const boundsTop = (vh - boundsH) / 2;
+    const boundsTop = (vh - boundsH) / 2 - stageRect.top;
 
     const typo = getComputedStyle(headline);
 
