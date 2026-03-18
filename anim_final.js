@@ -48,8 +48,7 @@
     __lenisInstance = new Lenis({
       lerp: 0.1,
       smoothTouch: false,
-      syncTouch: true,
-      syncTouchLerp: 0.075,
+      syncTouch: false,
     });
 
     if (typeof ScrollTrigger !== 'undefined') {
@@ -391,15 +390,18 @@
           }
         }, 0);
 
-        const onResize = () => {
-          const st = tl.scrollTrigger;
-          const progress = st && st.progress != null ? st.progress : 0;
-          if (progress < 0.05 || progress > 0.95) {
-            scatterNow();
-            ScrollTrigger.refresh();
-          }
-        };
-        window.addEventListener('resize', onResize, { passive: true });
+        let footerResizeTimeout;
+        window.addEventListener('resize', () => {
+          clearTimeout(footerResizeTimeout);
+          footerResizeTimeout = setTimeout(() => {
+            const st = tl.scrollTrigger;
+            const progress = st && st.progress != null ? st.progress : 0;
+            if (progress < 0.05 || progress > 0.95) {
+              scatterNow();
+              ScrollTrigger.refresh();
+            }
+          }, 400);
+        }, { passive: true });
       });
 
       if (maxTextTotal === 0) maxTextTotal = 1;
@@ -684,8 +686,7 @@
     if (sectionAbove) {
       sectionAbove.style.position = 'relative';
       sectionAbove.style.zIndex = '2';
-      sectionAbove.style.webkitTransform = 'translateZ(0)';
-      sectionAbove.style.transform = 'translateZ(0)';
+      sectionAbove.style.isolation = 'isolate';
     }
 
     ScrollTrigger.create({
@@ -693,6 +694,7 @@
       start: 'top top',
       end: 'bottom bottom',
       pin: container,
+      pinType: 'transform',
     });
 
     const gap = 30;
@@ -979,7 +981,7 @@ function createScatter(headline) {
         trigger: scrollEl,
         start: 'top top',
         end: '+=300%',
-        scrub: 1.2,
+        scrub: 0.5,
         onToggle: self => { scatterScrollTrigger = self; },
       },
     });
