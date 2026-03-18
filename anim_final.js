@@ -667,6 +667,17 @@
     const container = root.querySelector('.container');
     if (!pinHeight || !container) return;
 
+    // Safari iOS: Section darüber bleibt über dem Pin-Stack (kein Überfahren/Überblenden)
+    root.style.position = 'relative';
+    root.style.zIndex = '1';
+    const sectionAbove = root.previousElementSibling;
+    if (sectionAbove) {
+      sectionAbove.style.position = 'relative';
+      sectionAbove.style.zIndex = '2';
+      sectionAbove.style.webkitTransform = 'translateZ(0)';
+      sectionAbove.style.transform = 'translateZ(0)';
+    }
+
     ScrollTrigger.create({
       trigger: pinHeight,
       start: 'top top',
