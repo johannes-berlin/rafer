@@ -846,14 +846,14 @@ function createScatter(headline) {
     const stageRect = stage.getBoundingClientRect();
     const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
 
-    // Zentrierung viewport-relativ + 1.5rem nach rechts
+    // Zentrierung viewport-relativ
     const nonSpace = targets.filter(t => !t.space);
     if (nonSpace.length) {
       const vxValues = nonSpace.map(t => t.cx + stageRect.left);
       const minVX = Math.min(...vxValues);
       const maxVX = Math.max(...vxValues);
       const textCenterVX = minVX + (maxVX - minVX) / 2;
-      const offsetX = vw / 2 - textCenterVX + 1.5 * rem;
+      const offsetX = vw / 2 - textCenterVX;
       targets.forEach(t => { t.cx += offsetX; });
     }
     const maxW = Math.min(55 * rem, vw);
