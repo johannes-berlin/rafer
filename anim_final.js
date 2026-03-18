@@ -779,21 +779,19 @@ function initScatterLoader() {
   gsap.set('.nav', { autoAlpha: 0, y: -100 });
   gsap.set('.sticky_cta', { autoAlpha: 0, y: 20 });
 
+  // Scroll während Load verhindern
+  document.documentElement.style.overflow = 'hidden';
+
   window.addEventListener('load', () => {
     window.scrollTo(0, 0);
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(() => {
-        document.querySelectorAll('[data-scatter]').forEach(el => {
-          const instance = createScatter(el);
-          scatterInstances.push(instance);
-        });
-      });
-    } else {
+
+    const fontsReady = document.fonts?.ready ?? Promise.resolve();
+    fontsReady.then(() => {
       document.querySelectorAll('[data-scatter]').forEach(el => {
-        const instance = createScatter(el);
-        scatterInstances.push(instance);
+        scatterInstances.push(createScatter(el));
       });
-    }
+      document.documentElement.style.overflow = '';
+    });
   });
 
   window.addEventListener(
@@ -810,6 +808,7 @@ function createScatter(headline) {
   const stage = sticky.querySelector('.scatter-stage');
   if (!stage) return { rebuild() {} };
   let letters = [];
+  let scatterScrollTrigger = null;
 
   function measureLayout() {
     const stageRect = stage.getBoundingClientRect();
@@ -844,9 +843,8 @@ function createScatter(headline) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const stageRect = stage.getBoundingClientRect();
-    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
 
-    // Zentrierung viewport-relativ
+    // Zentrierung viewport-relativ berechnen
     const nonSpace = targets.filter(t => !t.space);
     if (nonSpace.length) {
       const vxValues = nonSpace.map(t => t.cx + stageRect.left);
@@ -856,6 +854,8 @@ function createScatter(headline) {
       const offsetX = vw / 2 - textCenterVX;
       targets.forEach(t => { t.cx += offsetX; });
     }
+
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
     const maxW = Math.min(55 * rem, vw);
     const boundsLeft = (vw - maxW) / 2 - stageRect.left;
     const boundsH = vh * 0.6;
@@ -972,6 +972,7 @@ function createScatter(headline) {
         start: 'top top',
         end: '+=300%',
         scrub: 1.2,
+        onToggle: self => { scatterScrollTrigger = self; },
       },
     });
 
@@ -1004,14 +1005,22 @@ function createScatter(headline) {
     );
 
     tl.to({}, { duration: 1 }, 1);
+
+    // Referenz direkt vom timeline holen
+    scatterScrollTrigger = tl.scrollTrigger;
   }
 
   function rebuild() {
-    ScrollTrigger.getAll().forEach(st => st.kill());
+    // Nur den scatter-eigenen ScrollTrigger killen
+    if (scatterScrollTrigger) {
+      scatterScrollTrigger.kill();
+      scatterScrollTrigger = null;
+    }
     stage.innerHTML = '';
     letters = [];
     headline.style.visibility = '';
-    build();
+    // Reflow abwarten bevor neu gemessen wird
+    requestAnimationFrame(() => requestAnimationFrame(() => build()));
   }
 
   build();
