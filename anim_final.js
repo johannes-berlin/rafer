@@ -841,16 +841,14 @@
       const targets = measureLayout();
       headline.style.visibility = 'hidden';
 
-      const stageW = stage.getBoundingClientRect().width;
+      const stageW = stage.offsetWidth;
       const vw = sticky.offsetWidth;
       const vh = sticky.offsetHeight;
 
-      // Textblock horizontal in der scatter-stage zentrieren (Stage-Koordinaten)
+      // Textblock horizontal in der scatter-stage zentrieren (Stage-Mitte = stageW/2)
       const nonSpace = targets.filter(t => !t.space);
       if (nonSpace.length) {
-        const minCx = Math.min(...nonSpace.map(t => t.cx));
-        const maxCx = Math.max(...nonSpace.map(t => t.cx));
-        const centerX = (minCx + maxCx) / 2;
+        const centerX = nonSpace.reduce((s, t) => s + t.cx, 0) / nonSpace.length;
         const offsetX = stageW / 2 - centerX;
         targets.forEach(t => { t.cx += offsetX; });
       }
@@ -1010,7 +1008,7 @@
       ScrollTrigger.getAll().forEach(st => st.kill());
       stage.innerHTML = '';
       letters = [];
-      headline.style.visibility = 'hidden';
+      headline.style.visibility = ''; // sichtbar für measureLayout() in build()
       build();
     }
 
