@@ -1470,6 +1470,161 @@ function createScatter(headline) {
   }
 
   // =========================================================
+  // Nav Wrap (Overlay + Scatter Links + Hamburger)
+  // =========================================================
+  function initNavWrap() {
+    if (typeof gsap === 'undefined') return;
+    document.querySelectorAll('.nav_wrap').forEach((component) => {
+      if (component.dataset.scriptInitialized) return;
+      component.dataset.scriptInitialized = 'true';
+      const toggle = component.querySelector('.nav_toggle_wrap');
+      const overlay = component.querySelector('.nav_overlay_wrap');
+      const lineTop = component.querySelector('.nav_toggle_line--top');
+      const lineBot = component.querySelector('.nav_toggle_line--bot');
+      const navBar = component.querySelector('.nav_bar');
+      const primaryLinks = component.querySelectorAll('.nav_primary_link_wrap');
+      const secondaryLinks = component.querySelectorAll('.nav_social_link_wrap, .nav_legal_link_wrap');
+      if (!toggle || !overlay || !lineTop || !lineBot) return;
+      let isOpen = false;
+      let openTl = null;
+
+      function splitToScatterChars(el) {
+        const text = el.textContent.trim();
+        el.setAttribute('aria-label', text);
+        el.innerHTML = '';
+        for (const char of text) {
+          if (char === ' ') {
+            el.appendChild(document.createTextNode(' '));
+            continue;
+          }
+          const span = document.createElement('span');
+          span.classList.add('nav_scatter_char');
+          span.setAttribute('aria-hidden', 'true');
+          span.textContent = char;
+          el.appendChild(span);
+        }
+      }
+
+      primaryLinks.forEach((link) => {
+        const textEl = link.querySelector('.nav_primary_link_text');
+        if (textEl) splitToScatterChars(textEl);
+      });
+
+      function getChars(link) {
+        return Array.from(link.querySelectorAll('.nav_scatter_char'));
+      }
+
+      function buildOpenTimeline() {
+        const tl = gsap.timeline({ paused: true });
+        const overlayEase = 'power4.inOut';
+        tl.fromTo(overlay,
+          { clipPath: 'inset(0 0 100% 0)' },
+          { clipPath: 'inset(0 0 0% 0)', duration: 0.75, ease: overlayEase },
+          0
+        );
+        tl.to(lineTop, { y: '0.45rem', rotation: 45, duration: 0.4, ease: 'power3.inOut' }, 0.1);
+        tl.to(lineBot, { y: '-0.45rem', rotation: -45, duration: 0.4, ease: 'power3.inOut' }, 0.1);
+        primaryLinks.forEach((link, linkIndex) => {
+          const chars = getChars(link);
+          const linkDelay = 0.35 + linkIndex * 0.07;
+          const charDuration = 0.55;
+          const charStagger = 0.025;
+          chars.forEach((char) => {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 30 + Math.random() * 50;
+            const rx = Math.cos(angle) * dist;
+            const ry = Math.sin(angle) * dist;
+            const rot = (Math.random() - 0.5) * 35;
+            gsap.set(char, { x: rx, y: ry, rotation: rot, opacity: 0 });
+          });
+          tl.to(chars, {
+            x: 0, y: 0, rotation: 0, opacity: 1,
+            duration: charDuration, ease: 'expo.out', stagger: charStagger
+          }, linkDelay);
+        });
+        tl.fromTo(secondaryLinks,
+          { opacity: 0, y: '0.75rem' },
+          { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out', stagger: 0.04 },
+          0.5
+        );
+        return tl;
+      }
+
+      function openNav() {
+        isOpen = true;
+        overlay.classList.add('is-active');
+        overlay.setAttribute('aria-hidden', 'false');
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.setAttribute('aria-label', 'Close navigation');
+        component.style.mixBlendMode = 'normal';
+        if (navBar) navBar.style.color = 'var(--swatch--light-100)';
+        primaryLinks.forEach((l) => l.setAttribute('tabindex', '0'));
+        secondaryLinks.forEach((l) => l.setAttribute('tabindex', '0'));
+        if (openTl) openTl.kill();
+        openTl = buildOpenTimeline();
+        openTl.play();
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeNav() {
+        isOpen = false;
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation');
+        primaryLinks.forEach((l) => l.setAttribute('tabindex', '-1'));
+        secondaryLinks.forEach((l) => l.setAttribute('tabindex', '-1'));
+        if (openTl) {
+          openTl.reverse();
+          openTl.eventCallback('onReverseComplete', () => {
+            overlay.classList.remove('is-active');
+            overlay.setAttribute('aria-hidden', 'true');
+            component.style.mixBlendMode = '';
+            if (navBar) navBar.style.color = '';
+          });
+        } else {
+          overlay.classList.remove('is-active');
+          overlay.setAttribute('aria-hidden', 'true');
+          component.style.mixBlendMode = '';
+          if (navBar) navBar.style.color = '';
+        }
+        document.body.style.overflow = '';
+      }
+
+      toggle.addEventListener('click', () => {
+        if (isOpen) closeNav();
+        else openNav();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isOpen) {
+          closeNav();
+          toggle.focus();
+        }
+      });
+
+      overlay.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab' || !isOpen) return;
+        const focusable = Array.from(overlay.querySelectorAll("a[tabindex='0'], button[tabindex='0']"));
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      });
+
+      primaryLinks.forEach((link) => {
+        link.addEventListener('click', () => {
+          if (isOpen) closeNav();
+        });
+      });
+    });
+  }
+
+  // =========================================================
   // 05) INITIALISIERUNG
   // =========================================================
   let __animFinalInitialized = false;
@@ -1486,6 +1641,7 @@ function createScatter(headline) {
     if (__animFinalInitialized) return;
     __animFinalInitialized = true;
     initLenis();
+    initNavWrap();
     initContentRevealScroll();
     initArrowPathAnimation();
     initChallengesAnimation();
