@@ -45,7 +45,7 @@
     }
     if (__lenisInstance) return;
 
-    // autoRaf: false – Lenis wird vom GSAP-Ticker angesteuert (saubere Sync mit ScrollTrigger, weniger Ruckler auf iOS)
+    // Lenis (with GSAP ScrollTrigger) – Ansatz laut Doku: Ticker + lagSmoothing(0)
     __lenisInstance = new Lenis({
       autoRaf: false,
       duration: 1.35,
@@ -53,17 +53,12 @@
       smoothTouch: true,
       touchMultiplier: 1.5
     });
-
     if (typeof ScrollTrigger !== 'undefined' && __lenisInstance && typeof __lenisInstance.on === 'function') {
       __lenisInstance.on('scroll', ScrollTrigger.update);
     }
-
     if (typeof gsap !== 'undefined' && __lenisInstance) {
-      __lenisGsapTicker = function (time) {
-        __lenisInstance.raf(time * 1000);
-      };
-      gsap.ticker.add(__lenisGsapTicker);
-      gsap.ticker.lagSmoothing(0); // Verhindert Aufhol-Sprünge nach Lag (wichtig für Safari iOS)
+      gsap.ticker.add((time) => { __lenisInstance.raf(time * 1000); });
+      gsap.ticker.lagSmoothing(0);
     }
 
     const jq = window.jQuery || window.$;
