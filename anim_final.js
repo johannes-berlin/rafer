@@ -45,18 +45,10 @@
     }
     if (__lenisInstance) return;
 
-    // Lenis (with GSAP ScrollTrigger) – Ansatz laut Doku: Ticker + lagSmoothing(0)
-    __lenisInstance = new Lenis({
-      autoRaf: false,
-      duration: 1.35,
-      lerp: 0.08,
-      smoothTouch: true,
-      touchMultiplier: 1.5
-    });
-    if (typeof ScrollTrigger !== 'undefined' && __lenisInstance && typeof __lenisInstance.on === 'function') {
-      __lenisInstance.on('scroll', ScrollTrigger.update);
-    }
-    if (typeof gsap !== 'undefined' && __lenisInstance) {
+    // Lenis (with GSAP Scrolltrigger) – laut Doku
+    __lenisInstance = new Lenis();
+    if (typeof ScrollTrigger !== 'undefined') __lenisInstance.on('scroll', ScrollTrigger.update);
+    if (typeof gsap !== 'undefined') {
       gsap.ticker.add((time) => { __lenisInstance.raf(time * 1000); });
       gsap.ticker.lagSmoothing(0);
     }
