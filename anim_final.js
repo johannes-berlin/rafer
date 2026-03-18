@@ -809,6 +809,7 @@ function createScatter(headline) {
   if (!stage) return { rebuild() {} };
   let letters = [];
   let scatterScrollTrigger = null;
+  let indicatorScrollTrigger = null;
 
   function measureLayout() {
     const stageRect = stage.getBoundingClientRect();
@@ -998,23 +999,28 @@ function createScatter(headline) {
       0.8
     );
 
-    tl.to(
-      '.sticky-indicator',
-      { autoAlpha: 0, duration: 0.2, ease: 'power2.out' },
-      0.05
-    );
-
     tl.to({}, { duration: 1 }, 1);
 
-    // Referenz direkt vom timeline holen
     scatterScrollTrigger = tl.scrollTrigger;
+
+    // .sticky-indicator nur am Page-Top sichtbar (bei Scroll ausblenden, bei Zurück-nach-oben einblenden)
+    if (indicatorScrollTrigger) indicatorScrollTrigger.kill();
+    indicatorScrollTrigger = ScrollTrigger.create({
+      start: 'top top',
+      end: '81px top',
+      onEnterBack: () => gsap.to('.sticky-indicator', { autoAlpha: 1, y: 0, duration: 0.3, ease: 'power2.out' }),
+      onLeave: () => gsap.to('.sticky-indicator', { autoAlpha: 0, duration: 0.2, ease: 'power2.out' }),
+    });
   }
 
   function rebuild() {
-    // Nur den scatter-eigenen ScrollTrigger killen
     if (scatterScrollTrigger) {
       scatterScrollTrigger.kill();
       scatterScrollTrigger = null;
+    }
+    if (indicatorScrollTrigger) {
+      indicatorScrollTrigger.kill();
+      indicatorScrollTrigger = null;
     }
     stage.innerHTML = '';
     letters = [];
