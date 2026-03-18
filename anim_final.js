@@ -45,10 +45,24 @@
     }
     if (__lenisInstance) return;
 
-    __lenisInstance = new Lenis({ autoRaf: true });
+    // autoRaf: false – Lenis wird vom GSAP-Ticker angesteuert (saubere Sync mit ScrollTrigger, weniger Ruckler auf iOS)
+    __lenisInstance = new Lenis({
+      autoRaf: false,
+      duration: 1.15,
+      smoothTouch: false,
+      touchMultiplier: 1.5
+    });
 
     if (typeof ScrollTrigger !== 'undefined' && __lenisInstance && typeof __lenisInstance.on === 'function') {
       __lenisInstance.on('scroll', ScrollTrigger.update);
+    }
+
+    if (typeof gsap !== 'undefined' && __lenisInstance) {
+      __lenisGsapTicker = function (time) {
+        __lenisInstance.raf(time * 1000);
+      };
+      gsap.ticker.add(__lenisGsapTicker);
+      gsap.ticker.lagSmoothing(0); // Verhindert Aufhol-Sprünge nach Lag (wichtig für Safari iOS)
     }
 
     const jq = window.jQuery || window.$;
