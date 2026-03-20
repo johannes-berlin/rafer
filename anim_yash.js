@@ -1917,6 +1917,7 @@
         component.dataset.scriptInitialized = "true";
         const toggle = component.querySelector(".nav_toggle_wrap");
         const overlay = component.querySelector(".nav_overlay_wrap");
+        const backdrop = component.querySelector(".nav_backdrop");
         const lineTop = component.querySelector(".nav_toggle_line--top");
         const lineBot = component.querySelector(".nav_toggle_line--bot");
         const navBar = component.querySelector(".nav_bar");
@@ -2025,6 +2026,11 @@
           if (navBar) navBar.style.color = "var(--swatch--light-100)";
           primaryLinks.forEach((l) => l.setAttribute("tabindex", "0"));
           secondaryLinks.forEach((l) => l.setAttribute("tabindex", "0"));
+          if (backdrop) {
+            gsap.killTweensOf(backdrop);
+            gsap.set(backdrop, { visibility: "visible" });
+            gsap.to(backdrop, { opacity: 1, duration: 0.4, ease: "power2.out" });
+          }
           if (openTl) openTl.kill();
           openTl = buildOpenTimeline();
           openTl.play();
@@ -2037,6 +2043,15 @@
           toggle.setAttribute("aria-label", "Open navigation");
           primaryLinks.forEach((l) => l.setAttribute("tabindex", "-1"));
           secondaryLinks.forEach((l) => l.setAttribute("tabindex", "-1"));
+          if (backdrop) {
+            gsap.killTweensOf(backdrop);
+            gsap.to(backdrop, {
+              opacity: 0,
+              duration: 0.3,
+              ease: "power2.in",
+              onComplete: () => gsap.set(backdrop, { visibility: "hidden" }),
+            });
+          }
           if (openTl) {
             openTl.reverse();
             openTl.eventCallback("onReverseComplete", () => {
