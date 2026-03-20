@@ -1922,6 +1922,12 @@
           backdrop = component.parentElement.querySelector(".nav_backdrop");
         }
         if (!backdrop) backdrop = document.querySelector(".nav_backdrop");
+        // fixed + transform-Vorfahren (nav_wrap / Webflow-GPU) = nur Zeilenhöhe.
+        // An body hängen → echter Viewport für inset:0.
+        if (backdrop && backdrop.parentElement !== document.body) {
+          backdrop.dataset.navBackdropPortal = "true";
+          document.body.appendChild(backdrop);
+        }
         const lineTop = component.querySelector(".nav_toggle_line--top");
         const lineBot = component.querySelector(".nav_toggle_line--bot");
         const navBar = component.querySelector(".nav_bar");
