@@ -2082,12 +2082,22 @@
             first.focus();
           }
         });
-  
-        primaryLinks.forEach((link) => {
-          link.addEventListener("click", () => {
-            if (isOpen) closeNav();
-          });
+
+        // Schließen bei Klick auf einen Link im Overlay (Delegation auf <a>, nicht nur auf Wrapper)
+        overlay.addEventListener("click", (e) => {
+          const a = e.target.closest("a[href]");
+          if (!a || !overlay.contains(a)) return;
+          if (isOpen) closeNav();
         });
+
+        // Schließen bei Klick außerhalb von Overlay (Toggle ausgenommen – dort öffnet/schließt der Toggle selbst)
+        function onDocumentClickCloseNav(e) {
+          if (!isOpen) return;
+          if (overlay.contains(e.target)) return;
+          if (toggle.contains(e.target)) return;
+          closeNav();
+        }
+        document.addEventListener("click", onDocumentClickCloseNav);
       });
     }
   
